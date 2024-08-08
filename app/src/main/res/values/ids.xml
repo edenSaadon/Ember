@@ -22,4 +22,6 @@
     <item name="viewPager" type="id"/>
     <item name="btnPrevious" type="id"/>
     <item name="btnNext" type="id"/>
+    <item name="btn_like" type="id"/>
+    <item name="btn_dislike" type="id"/>
 </resources>
