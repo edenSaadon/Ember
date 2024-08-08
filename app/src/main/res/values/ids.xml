@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="input_age" type="id"/>
+    <item name="input_hobby" type="id"/>
+    <item name="input_status" type="id"/>
+    <item name="input_looking_for" type="id"/>
+    <item name="input_sexual_preference" type="id"/>
+    <item name="input_gender" type="id"/>
+    <item name="btn_save" type="id"/>
+    <item name="spinner_status" type="id"/>
+    <item name="spinner_sexual_preference" type="id"/>
+    <item name="spinner_gender" type="id"/>
+    <item name="input_birthdate" type="id"/>
+    <item name="input_name" type="id"/>
+    <item name="frame" type="id"/>
+    <item name="bottom_navigation" type="id"/>
+    <item name="recyclerView" type="id"/>
+    <item name="user_image" type="id"/>
+    <item name="user_name" type="id"/>
+    <item name="navigation_home" type="id"/>
+    <item name="navigation_profile" type="id"/>
+    <item name="viewPager" type="id"/>
+    <item name="btnPrevious" type="id"/>
+    <item name="btnNext" type="id"/>
+</resources>
