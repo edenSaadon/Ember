@@ -1,5 +1,6 @@
 package com.example.ember.Models;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ember.R;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
+    private static final String TAG = "UserAdapter";
     private List<String> imageUrls;
     private List<Integer> imageStatus; // 0 = Disliked, 1 = Liked, 2 = Undecided
 
@@ -42,7 +45,30 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         }
 
         String imageUrl = imageUrls.get(position);
-        Picasso.get().load(imageUrl).into(holder.userImage);
+        Log.d(TAG, "Loading image URL: " + imageUrl);
+
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            Log.e(TAG, "Empty or null imageUrl for position: " + position);
+            return;
+        }
+
+        // Load image using Picasso with error handling
+        Picasso.get()
+                .load(imageUrl)
+                .error(R.drawable.ic_profile) // Image shown on error
+                .into(holder.userImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "Image loaded successfully: " + imageUrl);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e(TAG, "Error loading image: " + imageUrl, e);
+                        // If there's an error, set the placeholder image manually
+                        holder.userImage.setImageResource(R.drawable.ic_profile);
+                    }
+                });
 
         holder.btnLike.setOnClickListener(v -> {
             Toast.makeText(holder.itemView.getContext(), "Liked user", Toast.LENGTH_SHORT).show();

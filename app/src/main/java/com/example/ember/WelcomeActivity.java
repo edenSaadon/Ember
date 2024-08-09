@@ -23,6 +23,9 @@ import androidx.core.content.ContextCompat;
 
 import com.example.ember.Models.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -45,6 +48,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private Button saveButton;
 
     private FusedLocationProviderClient fusedLocationClient;
+    private LocationRequest locationRequest;
     private double latitude;
     private double longitude;
     private String cityName; // משתנה לשם העיר
@@ -92,6 +96,8 @@ public class WelcomeActivity extends AppCompatActivity {
                 // Do something when the user stops moving the SeekBar
             }
         });
+
+        createLocationRequest();
     }
 
     private void setupSpinners() {
@@ -137,21 +143,32 @@ public class WelcomeActivity extends AppCompatActivity {
         }
     }
 
+    private void createLocationRequest() {
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2000);
+    }
+
     private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        fusedLocationClient.getLastLocation().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                Location location = task.getResult();
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
-                cityName = getCityNameFromLocation(latitude, longitude); // קבלת שם העיר
-                Toast.makeText(this, "מיקום נוכחי: " + cityName, Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Failed to get location. Make sure location is enabled on the device.", Toast.LENGTH_SHORT).show();
+
+        fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                    cityName = getCityNameFromLocation(latitude, longitude); // קבלת שם העיר
+                    Toast.makeText(WelcomeActivity.this, "מיקום נוכחי: " + cityName, Toast.LENGTH_SHORT).show();
+                }
             }
-        });
+        }, null);
     }
 
     private String getCityNameFromLocation(double latitude, double longitude) {
