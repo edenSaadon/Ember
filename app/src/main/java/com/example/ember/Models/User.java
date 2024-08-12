@@ -1,5 +1,8 @@
 package com.example.ember.Models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
     private String userId;
     private String name;
@@ -22,9 +25,11 @@ public class User {
     private String imageUrl;
     private String cityName; // שדה לשם העיר
     private int imageStatus; // סטטוס התמונה (1 - לייק, 0 - דיסלייק, 2 - דיפולט)
+    private List<String> likedUsers; // רשימת משתמשים שעשו לייק
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        likedUsers = new ArrayList<>(); // Initialize list
     }
 
     public User(String userId, String name, String email, String phone, String sexualPreference, String gender, int age, String hobby, String status, String lookingFor, String birthdate, String partnerAgeRange, String partnerLocationRange, String partnerGender, String aboutYourself, double latitude, double longitude, int locationRange, String imageUrl, String cityName, int imageStatus) {
@@ -49,6 +54,7 @@ public class User {
         this.imageUrl = imageUrl;
         this.cityName = cityName;
         this.imageStatus = imageStatus;
+        this.likedUsers = new ArrayList<>(); // Initialize list
     }
 
     // Getters and setters for all fields
@@ -218,5 +224,24 @@ public class User {
 
     public void setImageStatus(int imageStatus) {
         this.imageStatus = imageStatus;
+    }
+
+    public List<String> getLikedUsers() {
+        return likedUsers;
+    }
+
+    public void setLikedUsers(List<String> likedUsers) {
+        this.likedUsers = likedUsers;
+    }
+
+    public void addLikedUser(String userId) {
+        if (!likedUsers.contains(userId)) {
+            likedUsers.add(userId);
+        }
+    }
+
+    // פונקציה שמחזירה את סטטוס התמונה
+    public int getImageStatusForUser() {
+        return imageStatus;
     }
 }

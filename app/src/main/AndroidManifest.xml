@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.ember">
-
     <!-- Permissions for location and internet access -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- Permissions for reading external storage, required for file uploads -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Permissions for reading external storage, required for file uploads -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- Permissions for writing external storage -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -18,8 +16,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Ember">
-
+        <activity
+            android:name=".ChatListActivity"
+            android:exported="false" />
         <!-- Activities -->
+        <activity
+            android:name=".ChatActivity"
+            android:exported="true" />
         <activity
             android:name=".CityDisplayActivity"
             android:exported="false"
@@ -41,6 +44,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -49,6 +53,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -56,16 +61,14 @@
             android:name=".MainActivity"
             android:exported="true" />
         <activity
-            android:name=".ProfileActivity" />
-
-        <!-- Firebase and Google Maps API key metadata -->
+            android:name=".ProfileActivity"
+            android:exported="false" /> <!-- Firebase and Google Maps API key metadata -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBGIh5lCwSGMSqCpU4saBNTt8F306bvqZY" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_launcher" />
-
     </application>
 
 </manifest>

@@ -7,14 +7,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.ember.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,11 +20,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private static final String TAG = "UserAdapter";
     private List<String> imageUrls;
+    private List<String> userIds;
     private List<Integer> imageStatus; // 0 = Disliked, 1 = Liked, 2 = Undecided
+    private OnLikeDislikeListener likeDislikeListener; // Listener for like/dislike actions
 
-    public UserAdapter(List<String> imageUrls) {
+    public UserAdapter(List<String> imageUrls, List<String> userIds, OnLikeDislikeListener likeDislikeListener) {
         this.imageUrls = new ArrayList<>(imageUrls);
+        this.userIds = new ArrayList<>(userIds);
         this.imageStatus = new ArrayList<>(Collections.nCopies(imageUrls.size(), 2)); // Initialize with 2 (Undecided)
+        this.likeDislikeListener = likeDislikeListener; // Initialize the listener
     }
 
     @NonNull
@@ -73,39 +74,33 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.btnLike.setOnClickListener(v -> {
             Toast.makeText(holder.itemView.getContext(), "Liked user", Toast.LENGTH_SHORT).show();
             imageStatus.set(position, 1); // Set status to liked
-            moveToEndOfList(position); // Move user to end of list
-            notifyItemRemoved(position); // Notify adapter that item was removed from this position
-            notifyItemInserted(imageUrls.size() - 1); // Notify adapter that item was added to end
-            notifyDataSetChanged(); // Refresh the list
+            if (likeDislikeListener != null) {
+                likeDislikeListener.onLike(position); // Notify listener about the like
+            }
+            removeUserAt(position); // Remove the liked user from the list
         });
 
         holder.btnDislike.setOnClickListener(v -> {
             Toast.makeText(holder.itemView.getContext(), "Disliked user", Toast.LENGTH_SHORT).show();
-            removeFromList(position); // Remove user from list
-            notifyItemRemoved(position); // Refresh the list
-            notifyDataSetChanged(); // Refresh the list
+            imageStatus.set(position, 0); // Set status to disliked
+            if (likeDislikeListener != null) {
+                likeDislikeListener.onDislike(position); // Notify listener about the dislike
+            }
+            removeUserAt(position); // Remove the disliked user from the list
         });
     }
 
     @Override
     public int getItemCount() {
-        return imageUrls.size() > 0 ? 1 : 0; // Display only one image at a time
+        return imageUrls.size(); // Return the current size of the list
     }
 
-    private void moveToEndOfList(int position) {
-        if (position < 0 || position >= imageUrls.size()) return;
-        String imageUrl = imageUrls.get(position);
-        int status = imageStatus.get(position);
-        imageUrls.remove(position);
-        imageStatus.remove(position);
-        imageUrls.add(imageUrl);
-        imageStatus.add(status);
-    }
-
-    private void removeFromList(int position) {
+    public void removeUserAt(int position) {
         if (position < 0 || position >= imageUrls.size()) return;
         imageUrls.remove(position);
+        userIds.remove(position);
         imageStatus.remove(position);
+        notifyItemRemoved(position);
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
@@ -119,5 +114,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             btnLike = itemView.findViewById(R.id.btn_like);
             btnDislike = itemView.findViewById(R.id.btn_dislike);
         }
+    }
+
+    public interface OnLikeDislikeListener {
+        void onLike(int position);
+        void onDislike(int position);
     }
 }

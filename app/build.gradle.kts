@@ -76,6 +76,11 @@ dependencies {
     implementation (libs.firebase.storage)
 
 
+        implementation (libs.recyclerview.v132)
+        implementation (libs.recyclerview)
+        implementation (libs.databinding.runtime)
+
+
 
 
 

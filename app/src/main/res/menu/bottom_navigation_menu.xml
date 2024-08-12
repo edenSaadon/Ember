@@ -9,6 +9,10 @@
         android:icon="@drawable/ic_profile"
         android:title="Profile" />
     <item
+        android:id="@+id/navigation_chat"
+        android:icon="@drawable/ic_chat"
+        android:title="Chat" />
+    <item
         android:id="@+id/action_logout"
         android:title="Logout"
         android:icon="@drawable/ic_logout"
