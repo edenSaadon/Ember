@@ -1,4 +1,5 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/navigation_home"
         android:icon="@drawable/ic_home"
@@ -7,4 +8,9 @@
         android:id="@+id/navigation_profile"
         android:icon="@drawable/ic_profile"
         android:title="Profile" />
+    <item
+        android:id="@+id/action_logout"
+        android:title="Logout"
+        android:icon="@drawable/ic_logout"
+        app:showAsAction="ifRoom" />
 </menu>

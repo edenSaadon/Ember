@@ -8,12 +8,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Permissions for reading external storage -->
-    <!-- Required for file uploads -->
+    <!-- Permissions for reading external storage, required for file uploads -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <!-- Note: WRITE_EXTERNAL_STORAGE is not required on Android 10 (API 29) and above due to scoped storage -->
-    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
 
     <application
         android:allowBackup="true"
@@ -23,24 +19,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ember">
 
-        <!-- Firebase and Google Maps API key metadata -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBGIh5lCwSGMSqCpU4saBNTt8F306bvqZY" />
-
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher" />
-
         <!-- Activities -->
+        <activity
+            android:name=".CityDisplayActivity"
+            android:exported="false"
+            android:label="@string/title_activity_city_display" />
+        <activity
+            android:name=".EmailLoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PhoneVerificationActivity"
+            android:exported="false" />
         <activity
             android:name=".UploadImageActivity"
             android:exported="false" />
-
         <activity
             android:name=".WelcomeActivity"
             android:exported="false" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -49,12 +44,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".LoginUserActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+        <activity
+            android:name=".ProfileActivity" />
 
-        <activity android:name=".ProfileActivity" />
+        <!-- Firebase and Google Maps API key metadata -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBGIh5lCwSGMSqCpU4saBNTt8F306bvqZY" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+
     </application>
 
 </manifest>

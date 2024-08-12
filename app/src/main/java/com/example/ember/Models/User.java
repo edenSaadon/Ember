@@ -1,4 +1,3 @@
-
 package com.example.ember.Models;
 
 public class User {
@@ -22,12 +21,13 @@ public class User {
     private int locationRange;
     private String imageUrl;
     private String cityName; // שדה לשם העיר
+    private int imageStatus; // סטטוס התמונה (1 - לייק, 0 - דיסלייק, 2 - דיפולט)
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String userId, String name, String email, String phone, String sexualPreference, String gender, int age, String hobby, String status, String lookingFor, String birthdate, String partnerAgeRange, String partnerLocationRange, String partnerGender, String aboutYourself, double latitude, double longitude, int locationRange, String imageUrl, String cityName) {
+    public User(String userId, String name, String email, String phone, String sexualPreference, String gender, int age, String hobby, String status, String lookingFor, String birthdate, String partnerAgeRange, String partnerLocationRange, String partnerGender, String aboutYourself, double latitude, double longitude, int locationRange, String imageUrl, String cityName, int imageStatus) {
         this.userId = userId;
         this.name = name;
         this.email = email;
@@ -48,6 +48,7 @@ public class User {
         this.locationRange = locationRange;
         this.imageUrl = imageUrl;
         this.cityName = cityName;
+        this.imageStatus = imageStatus;
     }
 
     // Getters and setters for all fields
@@ -209,5 +210,13 @@ public class User {
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
+    }
+
+    public int getImageStatus() {
+        return imageStatus;
+    }
+
+    public void setImageStatus(int imageStatus) {
+        this.imageStatus = imageStatus;
     }
 }

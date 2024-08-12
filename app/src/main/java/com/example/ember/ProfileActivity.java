@@ -1,5 +1,6 @@
 package com.example.ember;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -138,11 +139,27 @@ public class ProfileActivity extends AppCompatActivity {
     private void loadUserProfile() {
         if (currentUser != null) {
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @SuppressLint("StaticFieldLeak")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     User user = dataSnapshot.getValue(User.class);
                     if (user != null) {
-                        updateUI(user);
+                        // שימוש ב-GeocodingTask כדי לקבל שם עיר אם לא קיים
+                        if (user.getCityName() == null || user.getCityName().isEmpty()) {
+                            new com.example.ember.NominatimGeocodingTask() {
+                                @Override
+                                protected void onPostExecute(String cityName) {
+                                    if (cityName != null) {
+                                        user.setCityName(cityName);
+                                        updateUI(user);
+                                    } else {
+                                        Log.e(TAG, "Failed to determine city");
+                                    }
+                                }
+                            }.execute(user.getLatitude(), user.getLongitude());
+                        } else {
+                            updateUI(user);
+                        }
                     } else {
                         Log.e(TAG, "User data is null");
                     }
@@ -176,6 +193,7 @@ public class ProfileActivity extends AppCompatActivity {
         details.append("Partner Location Range: ").append(user.getPartnerLocationRange()).append("\n");
         details.append("Partner Gender: ").append(user.getPartnerGender()).append("\n");
         details.append("About Yourself: ").append(user.getAboutYourself()).append("\n");
+        details.append("City: ").append(user.getCityName()).append("\n");
         details.append("Latitude: ").append(user.getLatitude()).append("\n");
         details.append("Longitude: ").append(user.getLongitude()).append("\n");
 

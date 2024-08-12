@@ -24,4 +24,9 @@
     <item name="btnNext" type="id"/>
     <item name="btn_like" type="id"/>
     <item name="btn_dislike" type="id"/>
+    <item name="action_logout" type="id"/>
+
+
+
+
 </resources>

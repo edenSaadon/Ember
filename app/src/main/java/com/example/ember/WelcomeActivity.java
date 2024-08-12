@@ -1,13 +1,13 @@
 package com.example.ember;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,54 +32,80 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.IOException;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
 
 public class WelcomeActivity extends AppCompatActivity {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
-    private EditText nameInput, ageInput, hobbyInput, aboutYourselfInput, birthdateInput;
-    private Spinner genderSpinner, sexualPreferenceSpinner, statusSpinner, lookingForSpinner;
+    private EditText nameInput, ageInput, hobbyInput, aboutYourselfInput, birthdateInput, partnerAgeRangeInput;
+    private Spinner genderSpinner, sexualPreferenceSpinner, statusSpinner, lookingForSpinner, partnerGenderSpinner;
     private SeekBar partnerLocationSeekBar;
     private TextView partnerLocationTextView;
     private Button saveButton;
 
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
     private double latitude;
     private double longitude;
-    private String cityName; // משתנה לשם העיר
+    private String cityName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
+        initializeViews();
+        setupSpinners();
+        setupListeners();
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        createLocationRequest();
+        createLocationCallback();
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        } else {
+            getLastKnownLocation();
+        }
+    }
+
+    private void initializeViews() {
         nameInput = findViewById(R.id.input_name);
         ageInput = findViewById(R.id.input_age);
         hobbyInput = findViewById(R.id.input_hobby);
         aboutYourselfInput = findViewById(R.id.input_about_yourself);
         birthdateInput = findViewById(R.id.input_birthdate);
+        partnerAgeRangeInput = findViewById(R.id.input_partner_age_range);
         genderSpinner = findViewById(R.id.spinner_gender);
         sexualPreferenceSpinner = findViewById(R.id.spinner_sexual_preference);
         statusSpinner = findViewById(R.id.spinner_status);
         lookingForSpinner = findViewById(R.id.spinner_looking_for);
+        partnerGenderSpinner = findViewById(R.id.spinner_partner_gender);
         partnerLocationSeekBar = findViewById(R.id.seekBar_partner_location_range);
         partnerLocationTextView = findViewById(R.id.txt_partner_location_range_value);
         saveButton = findViewById(R.id.btn_save);
+    }
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+    private void setupSpinners() {
+        setupSpinner(genderSpinner, R.array.gender_options);
+        setupSpinner(sexualPreferenceSpinner, R.array.sexual_preference_options);
+        setupSpinner(statusSpinner, R.array.status_options);
+        setupSpinner(lookingForSpinner, R.array.looking_for_options);
+        setupSpinner(partnerGenderSpinner, R.array.partner_gender_options);
+    }
 
-        setupSpinners();
-        checkLocationPermission();
+    private void setupSpinner(Spinner spinner, int arrayResourceId) {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                arrayResourceId, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
 
+    private void setupListeners() {
         birthdateInput.setOnClickListener(v -> showDatePickerDialog());
-
         saveButton.setOnClickListener(view -> saveUserData());
-
         partnerLocationSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -96,30 +122,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 // Do something when the user stops moving the SeekBar
             }
         });
-
-        createLocationRequest();
-    }
-
-    private void setupSpinners() {
-        ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(this,
-                R.array.gender_options, android.R.layout.simple_spinner_item);
-        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        genderSpinner.setAdapter(genderAdapter);
-
-        ArrayAdapter<CharSequence> sexualPreferenceAdapter = ArrayAdapter.createFromResource(this,
-                R.array.sexual_preference_options, android.R.layout.simple_spinner_item);
-        sexualPreferenceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sexualPreferenceSpinner.setAdapter(sexualPreferenceAdapter);
-
-        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(this,
-                R.array.status_options, android.R.layout.simple_spinner_item);
-        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        statusSpinner.setAdapter(statusAdapter);
-
-        ArrayAdapter<CharSequence> lookingForAdapter = ArrayAdapter.createFromResource(this,
-                R.array.looking_for_options, android.R.layout.simple_spinner_item);
-        lookingForAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        lookingForSpinner.setAdapter(lookingForAdapter);
     }
 
     private void showDatePickerDialog() {
@@ -135,53 +137,48 @@ public class WelcomeActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-        } else {
-            getLocation();
-        }
-    }
-
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(2000);
+        locationRequest.setInterval(10000); // 10 seconds
+        locationRequest.setFastestInterval(5000); // 5 seconds
     }
 
-    private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+    private void createLocationCallback() {
+        locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                    cityName = getCityNameFromLocation(latitude, longitude); // קבלת שם העיר
-                    Toast.makeText(WelcomeActivity.this, "מיקום נוכחי: " + cityName, Toast.LENGTH_SHORT).show();
+                if (locationResult != null) {
+                    for (Location location : locationResult.getLocations()) {
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                        Log.d("WelcomeActivity", "Updated Location: " + latitude + ", " + longitude);
+                        // ניתן להוסיף כאן קוד נוסף לשימוש במיקום החדש
+                    }
                 }
             }
-        }, null);
+        };
     }
 
-    private String getCityNameFromLocation(double latitude, double longitude) {
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            if (!addresses.isEmpty()) {
-                return addresses.get(0).getLocality();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    @SuppressLint("MissingPermission")
+    private void getLastKnownLocation() {
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                        Log.d("WelcomeActivity", "Latitude: " + latitude + ", Longitude: " + longitude);
+                    } else {
+                        Log.e("WelcomeActivity", "Failed to get location. Requesting updates...");
+                        startLocationUpdates();
+                    }
+                });
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
         }
-        return "Unknown";
     }
 
     private void saveUserData() {
@@ -194,9 +191,9 @@ public class WelcomeActivity extends AppCompatActivity {
         String selectedSexualPreference = sexualPreferenceSpinner.getSelectedItem().toString();
         String selectedStatus = statusSpinner.getSelectedItem().toString();
         String selectedLookingFor = lookingForSpinner.getSelectedItem().toString();
-        int partnerAgeRange = 10; // Example value
-        int partnerLocationRange = partnerLocationSeekBar.getProgress(); // Updated to use SeekBar value
-        String selectedPartnerGender = "Any"; // Example value
+        String partnerAgeRange = partnerAgeRangeInput.getText().toString();
+        int partnerLocationRange = partnerLocationSeekBar.getProgress();
+        String selectedPartnerGender = partnerGenderSpinner.getSelectedItem().toString();
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String userId = currentUser.getUid();
@@ -204,7 +201,7 @@ public class WelcomeActivity extends AppCompatActivity {
         String phone = currentUser.getPhoneNumber();
         String imageUrl = ""; // ניתן להוסיף URL של תמונת פרופיל כאן אם יש
 
-        User user = new User(userId, name, email, phone, selectedSexualPreference, selectedGender, age, hobby, selectedStatus, selectedLookingFor, birthdate, String.valueOf(partnerAgeRange), String.valueOf(partnerLocationRange), selectedPartnerGender, aboutYourself, latitude, longitude, partnerLocationRange, imageUrl, cityName);
+        User user = new User(userId, name, email, phone, selectedSexualPreference, selectedGender, age, hobby, selectedStatus, selectedLookingFor, birthdate, partnerAgeRange, String.valueOf(partnerLocationRange), selectedPartnerGender, aboutYourself, latitude, longitude, partnerLocationRange, imageUrl, cityName, 2);
 
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Users");
         usersRef.child(userId).setValue(user);
@@ -219,10 +216,24 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getLocation();
+                getLastKnownLocation();
             } else {
                 Toast.makeText(this, "Location permission is required to use this app.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 }

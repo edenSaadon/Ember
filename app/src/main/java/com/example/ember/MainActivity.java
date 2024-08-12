@@ -1,8 +1,11 @@
 package com.example.ember;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ember.Models.User;
 import com.example.ember.Models.UserAdapter;
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,7 +52,40 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser != null) {
             Log.d(TAG, "Current user ID: " + currentUser.getUid());
-            loadFilteredUsers();
+
+            usersRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @SuppressLint("StaticFieldLeak")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User currentUserData = dataSnapshot.getValue(User.class);
+                    if (currentUserData != null) {
+                        // קבלת שם העיר באמצעות NominatimGeocodingTask
+                        new com.example.ember.NominatimGeocodingTask() {
+                            @Override
+                            protected void onPostExecute(String cityName) {
+                                if (cityName != null) {
+                                    Log.d(TAG, "User City: " + cityName);
+                                    // עדכון שם העיר במסד הנתונים אם הוא לא מעודכן
+                                    if (!cityName.equals(currentUserData.getCityName())) {
+                                        usersRef.child(currentUser.getUid()).child("cityName").setValue(cityName);
+                                    }
+                                    loadFilteredUsers();
+                                } else {
+                                    Log.e(TAG, "Failed to determine city");
+                                    loadFilteredUsers();
+                                }
+                            }
+                        }.execute(currentUserData.getLatitude(), currentUserData.getLongitude());
+                    } else {
+                        Log.e(TAG, "Current user data not found in database");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e(TAG, "Failed to read user data", databaseError.toException());
+                }
+            });
         } else {
             Log.e(TAG, "Current user is null");
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
@@ -63,11 +102,49 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                 startActivity(intent);
                 return true;
+            } else if (itemId == R.id.action_logout) {
+                Log.d(TAG, "Logging out");
+                performLogout();
+                return true;
             } else {
                 Log.d(TAG, "Unknown navigation item");
                 return false;
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.bottom_navigation_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_logout) {
+            performLogout();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void performLogout() {
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MainActivity.this, "Successfully logged out", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Logout failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private void loadFilteredUsers() {
@@ -109,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean matchesCurrentUserPreferences(User user, User currentUser) {
-        // Check if at least one preference matches
+        // בדיקת התאמה של מגדר
         boolean genderMatch = false;
         if (currentUser.getSexualPreference().equals("Heterosexual")) {
             genderMatch = !user.getGender().equals(currentUser.getGender());
@@ -119,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
             genderMatch = true;
         }
 
-        // Parse the partner age range
+        // ניתוח טווח גילאים
         int minAge = 0;
         int maxAge = Integer.MAX_VALUE;
         if (currentUser.getPartnerAgeRange() != null && currentUser.getPartnerAgeRange().contains("-")) {
@@ -132,25 +209,28 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        boolean ageMatch = user.getAge() >= minAge && user.getAge() <= maxAge;
+
+        // חישוב מרחק בין המשתמשים
         double distance = calculateDistance(currentUser.getLatitude(), currentUser.getLongitude(), user.getLatitude(), user.getLongitude());
         boolean withinLocationRange = distance <= currentUser.getLocationRange();
 
-        // At least one criteria must match
-        boolean matches = (genderMatch || (user.getAge() >= minAge && user.getAge() <= maxAge) || withinLocationRange);
+        // בדיקה אם אחד מהקריטריונים מתאים
+        boolean matches = (genderMatch || ageMatch || withinLocationRange);
 
         Log.d(TAG, "User: " + user.getName() + " | Matches: " + matches + " | Distance: " + distance + " | Age: " + user.getAge());
         return matches;
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371; // Radius of the earth in km
+        final int R = 6371; // רדיוס כדור הארץ בקילומטרים
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
         double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c; // convert to kilometers
+        double distance = R * c; // המרה לקילומטרים
         return distance;
     }
 

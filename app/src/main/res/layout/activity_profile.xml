@@ -29,6 +29,7 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="@android:color/white"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintTop_toBottomOf="@id/user_image"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,29 +39,31 @@
     <TextView
         android:id="@+id/user_details"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:textSize="16sp"
         android:textColor="@android:color/white"
-        android:gravity="center"
+        android:gravity="start"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/user_name"
+        app:layout_constraintBottom_toTopOf="@id/btn_edit_profile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="spread" />
 
     <Button
         android:id="@+id/btn_edit_profile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Edit Profile"
-        app:cornerRadius="16dp"
         android:backgroundTint="@android:color/holo_blue_light"
+        android:layout_marginTop="24dp"
+        app:cornerRadius="16dp"
         app:layout_constraintTop_toBottomOf="@id/user_details"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="24dp" />
+        app:layout_constraintHorizontal_bias="0.5" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

@@ -1,30 +1,35 @@
 <resources>
-    <string name="app_name">Ember</string>
-
     <string-array name="gender_options">
         <item>Male</item>
         <item>Female</item>
         <item>Other</item>
     </string-array>
-
     <string-array name="sexual_preference_options">
         <item>Heterosexual</item>
         <item>Homosexual</item>
         <item>Bisexual</item>
         <item>Other</item>
     </string-array>
-
     <string-array name="status_options">
         <item>Single</item>
-        <item>In a relationship</item>
+        <item>In a Relationship</item>
         <item>Married</item>
         <item>Divorced</item>
+        <item>Other</item>
     </string-array>
-
     <string-array name="looking_for_options">
         <item>Long-term</item>
         <item>Short-term</item>
-        <item>New friends</item>
+        <item>New Friends</item>
         <item>Hookups</item>
     </string-array>
+    <string-array name="partner_gender_options">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+    <string name="title_activity_city_display">CityDisplayActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

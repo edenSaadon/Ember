@@ -2,6 +2,8 @@ package com.example.ember;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -20,19 +22,42 @@ import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private Button buttonSignIn;
+    private Button buttonExistingUserLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        buttonSignIn = findViewById(R.id.buttonSignIn);
+        buttonExistingUserLogin = findViewById(R.id.buttonExistingUserLogin);
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (user == null) {
-            signIn();
-        } else {
-            checkUserProfile(user);
-        }
+        buttonSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (user == null) {
+                    signIn();
+                } else {
+                    checkUserProfile(user);
+                }
+            }
+        });
+
+        buttonExistingUserLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Open an activity for existing users to login with email/phone
+                openExistingUserLoginActivity();
+            }
+        });
+    }
+
+    private void openExistingUserLoginActivity() {
+        Intent intent = new Intent(this, LoginUserActivity.class);
+        startActivity(intent);
     }
 
     private void signIn() {
@@ -43,20 +68,9 @@ public class LoginActivity extends AppCompatActivity {
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
-                .setLogo(R.drawable.icon)
+                .setLogo(R.drawable.icon) // Set your custom logo here
                 .build();
         signInLauncher.launch(signInIntent);
-    }
-
-    private void transactToMainActivity() {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
-    private void transactToWelcomeActivity() {
-        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
@@ -76,10 +90,13 @@ public class LoginActivity extends AppCompatActivity {
                 saveInitialUserData(user);
                 transactToWelcomeActivity();
             }
+        } else {
+            // Sign in failed, handle error here
         }
     }
+
     private void checkUserProfile(FirebaseUser user) {
-        // בדיקה האם המשתמש כבר מילא את השאלון
+        // Check if the user has completed their profile
         String userId = user.getUid();
         FirebaseDatabase.getInstance().getReference("Users")
                 .child(userId)
@@ -96,6 +113,19 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private void transactToMainActivity() {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void transactToWelcomeActivity() {
+        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     private void saveInitialUserData(FirebaseUser firebaseUser) {
         String userId = firebaseUser.getUid();
         String email = firebaseUser.getEmail();
@@ -110,7 +140,4 @@ public class LoginActivity extends AppCompatActivity {
                 .child("phone")
                 .setValue(phone != null ? phone : "");
     }
-    }
-
-
-
+}
