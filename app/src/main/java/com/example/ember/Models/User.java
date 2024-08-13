@@ -227,6 +227,9 @@ public class User {
     }
 
     public List<String> getLikedUsers() {
+        if (likedUsers == null) {
+            likedUsers = new ArrayList<>(); // Initialize if null
+        }
         return likedUsers;
     }
 
@@ -235,6 +238,9 @@ public class User {
     }
 
     public void addLikedUser(String userId) {
+        if (likedUsers == null) {
+            likedUsers = new ArrayList<>(); // Initialize if null
+        }
         if (!likedUsers.contains(userId)) {
             likedUsers.add(userId);
         }

@@ -1,5 +1,7 @@
 package com.example.ember.Utilities;
 
+import android.util.Log;
+
 import com.example.ember.Models.User;
 import com.example.ember.Models.UserContainer;
 import com.google.firebase.database.DataSnapshot;
@@ -53,15 +55,43 @@ public class UserManager {
         List<User> filteredList = new ArrayList<>();
         for (User user : usersContainer.getUsersMap().values()) {
             if (!user.getUserId().equals(currentUser.getUserId())
-                    && user.getSexualPreference().equals(currentUser.getSexualPreference())
-                    && user.getGender().equals(currentUser.getPartnerGender())
-                    && user.getAge() >= Integer.parseInt(currentUser.getPartnerAgeRange().split("-")[0])
-                    && user.getAge() <= Integer.parseInt(currentUser.getPartnerAgeRange().split("-")[1])
-                    && calculateDistance(currentUser.getLatitude(), currentUser.getLongitude(), user.getLatitude(), user.getLongitude()) <= currentUser.getLocationRange()) {
+                    && matchesPreferences(user, currentUser)) {
                 filteredList.add(user);
             }
         }
         return filteredList;
+    }
+
+    private boolean matchesPreferences(User user, User currentUser) {
+        boolean genderMatch = false;
+        if (currentUser.getSexualPreference().equals("Heterosexual")) {
+            genderMatch = !user.getGender().equals(currentUser.getGender());
+        } else if (currentUser.getSexualPreference().equals("Homosexual")) {
+            genderMatch = user.getGender().equals(currentUser.getGender());
+        } else if (currentUser.getSexualPreference().equals("Bisexual")) {
+            genderMatch = true;
+        }
+
+        boolean relationshipMatch = currentUser.getLookingFor().equals(user.getLookingFor());
+
+        int minAge = 0;
+        int maxAge = Integer.MAX_VALUE;
+        if (currentUser.getPartnerAgeRange() != null && currentUser.getPartnerAgeRange().contains("-")) {
+            String[] ageRangeParts = currentUser.getPartnerAgeRange().split("-");
+            try {
+                minAge = Integer.parseInt(ageRangeParts[0].trim());
+                maxAge = Integer.parseInt(ageRangeParts[1].trim());
+            } catch (NumberFormatException e) {
+                Log.e("UserManager", "Invalid age range format", e);
+            }
+        }
+
+        boolean ageMatch = user.getAge() >= minAge && user.getAge() <= maxAge;
+
+        double distance = calculateDistance(currentUser.getLatitude(), currentUser.getLongitude(), user.getLatitude(), user.getLongitude());
+        boolean withinLocationRange = distance <= currentUser.getLocationRange();
+
+        return (genderMatch && relationshipMatch && ageMatch && withinLocationRange);
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {

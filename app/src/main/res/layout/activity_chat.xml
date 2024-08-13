@@ -1,43 +1,89 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Header layout for user info -->
+    <LinearLayout
+        android:id="@+id/chat_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="?attr/colorPrimary"
+        android:gravity="center_vertical">
+
+        <!-- User profile picture -->
+        <ImageView
+            android:id="@+id/user_profile_picture"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="User profile picture" />
+
+        <!-- User name -->
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Name"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- ListView for chat messages -->
     <ListView
         android:id="@+id/chat_list_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_below="@id/chat_header"
         android:layout_above="@id/send_message_layout"
-        android:layout_alignParentTop="true" />
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp" />
 
+    <!-- Layout for sending messages -->
     <LinearLayout
         android:id="@+id/send_message_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@android:color/white">
 
+        <!-- Input field for typing messages -->
         <EditText
             android:id="@+id/message_input"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Type a message" />
+            android:hint="Type a message"
+            android:padding="8dp"
+            android:background="@drawable/rounded_edittext"
+            android:inputType="textMultiLine" />
 
+        <!-- Button for sending messages -->
         <ImageButton
             android:id="@+id/send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackground"
             android:src="@android:drawable/ic_menu_send"
             android:contentDescription="Send message" />
     </LinearLayout>
 
+    <!-- Button for exiting the chat -->
     <ImageButton
         android:id="@+id/exit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:background="?attr/selectableItemBackground"
         android:src="@android:drawable/ic_menu_close_clear_cancel"
         android:contentDescription="Exit Chat" />
+
 </RelativeLayout>

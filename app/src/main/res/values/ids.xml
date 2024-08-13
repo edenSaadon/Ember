@@ -25,8 +25,13 @@
     <item name="btn_like" type="id"/>
     <item name="btn_dislike" type="id"/>
     <item name="action_logout" type="id"/>
-
-
+    <item name="send_button" type="id"/>
+    <item name="exit_button" type="id"/>
+    <item name="send_message_layout" type="id"/>
+    <item name="message_input" type="id"/>
+    <item name="chat_header" type="id"/>
+    <item name="user_profile_picture" type="id"/>
+    <item name="chat_list_view" type="id"/>
 
 
 </resources>

@@ -3,8 +3,12 @@ package com.example.ember;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -13,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.ember.Models.User;
 import com.example.ember.Models.UserAdapter;
+import com.example.ember.Models.Chat;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,7 +39,10 @@ public class MainActivity extends AppCompatActivity {
     private UserAdapter userAdapter;
     private FirebaseUser currentUser;
     private DatabaseReference usersRef;
+    private DatabaseReference likesRef;
+    private DatabaseReference dislikesRef;
     private BottomNavigationView bottomNavigationView;
+    private List<User> filteredUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         usersRef = FirebaseDatabase.getInstance().getReference("Users");
+        likesRef = FirebaseDatabase.getInstance().getReference("Likes");
+        dislikesRef = FirebaseDatabase.getInstance().getReference("Dislikes");
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser != null) {
@@ -80,6 +90,12 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        Button btnLike = findViewById(R.id.btn_like);
+        Button btnDislike = findViewById(R.id.btn_dislike);
+
+        btnLike.setOnClickListener(v -> likeCurrentUser());
+        btnDislike.setOnClickListener(v -> dislikeCurrentUser());
     }
 
     @Override
@@ -120,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<User> filteredUsers = new ArrayList<>();
+                filteredUsers = new ArrayList<>();
                 User currentUserData = null;
 
                 // Retrieve current user data
@@ -135,11 +151,10 @@ public class MainActivity extends AppCompatActivity {
                 if (currentUserData != null) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         User user = snapshot.getValue(User.class);
-                        // Exclude the current user
+                        // Exclude the current user, disliked users, and those you've already liked
                         if (user != null && !user.getUserId().equals(currentUser.getUid())) {
                             if (matchesCurrentUserPreferences(user, currentUserData)) {
                                 filteredUsers.add(user);
-                                Log.d(TAG, "User added: " + user.getName());
                             }
                         }
                     }
@@ -157,17 +172,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean matchesCurrentUserPreferences(User user, User currentUser) {
-        // Check if at least one preference matches
+        // Gender Preference Match
         boolean genderMatch = false;
         if (currentUser.getSexualPreference().equals("Heterosexual")) {
             genderMatch = !user.getGender().equals(currentUser.getGender());
         } else if (currentUser.getSexualPreference().equals("Homosexual")) {
             genderMatch = user.getGender().equals(currentUser.getGender());
         } else if (currentUser.getSexualPreference().equals("Bisexual")) {
-            genderMatch = true;
+            genderMatch = true; // Bisexual matches all genders
         }
 
-        // Parse the partner age range
+        // Relationship Preference Match
+        boolean relationshipMatch = user.getLookingFor().equals(currentUser.getLookingFor());
+
+        // Age Preference Match
         int minAge = 0;
         int maxAge = Integer.MAX_VALUE;
         if (currentUser.getPartnerAgeRange() != null && currentUser.getPartnerAgeRange().contains("-")) {
@@ -179,15 +197,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Invalid age range format", e);
             }
         }
+        boolean ageMatch = user.getAge() >= minAge && user.getAge() <= maxAge;
 
+        // Location Preference Match
         double distance = calculateDistance(currentUser.getLatitude(), currentUser.getLongitude(), user.getLatitude(), user.getLongitude());
         boolean withinLocationRange = distance <= currentUser.getLocationRange();
 
-        // At least one criteria must match
-        boolean matches = (genderMatch || (user.getAge() >= minAge && user.getAge() <= maxAge) || withinLocationRange);
-
-        Log.d(TAG, "User: " + user.getName() + " | Matches: " + matches + " | Distance: " + distance + " | Age: " + user.getAge());
-        return matches;
+        return genderMatch || relationshipMatch || ageMatch || withinLocationRange;
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -198,102 +214,100 @@ public class MainActivity extends AppCompatActivity {
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c; // convert to kilometers
-        return distance;
+        return R * c; // convert to kilometers
     }
 
     private void setupRecyclerView(List<User> filteredUsers) {
         if (filteredUsers.isEmpty()) {
             Toast.makeText(this, "No users match your preferences", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "No users matched the filter criteria.");
         } else {
-            List<String> imageUrls = new ArrayList<>();
-            List<String> userIds = new ArrayList<>();
-            for (User user : filteredUsers) {
-                if (user.getImageUrl() != null && !user.getImageUrl().isEmpty()) {
-                    Log.d(TAG, "Adding image URL: " + user.getImageUrl());
-                    imageUrls.add(user.getImageUrl());
-                    userIds.add(user.getUserId());
-                } else {
-                    Log.e(TAG, "User " + user.getName() + " has no valid image URL");
-                }
-            }
-            userAdapter = new UserAdapter(imageUrls, userIds, new UserAdapter.OnLikeDislikeListener() {
-                @Override
-                public void onLike(int position) {
-                    String likedUserId = userIds.get(position);
-                    Log.d(TAG, "Liked user ID: " + likedUserId);
-                    checkForMatches(likedUserId);
-                }
-
-                @Override
-                public void onDislike(int position) {
-                    Log.d(TAG, "Disliked user at position: " + position);
-                }
+            userAdapter = new UserAdapter(this, filteredUsers, userId -> {
+                Log.d(TAG, "User clicked: " + userId);
+                // You can define what to do when a user is clicked (e.g., like or dislike)
             });
             recyclerView.setAdapter(userAdapter);
         }
     }
 
-    private void checkForMatches(String likedUserId) {
-        DatabaseReference currentUserRef = usersRef.child(currentUser.getUid());
-        currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User currentUserData = snapshot.getValue(User.class);
-                if (currentUserData != null) {
-                    currentUserData.addLikedUser(likedUserId);
-                    currentUserRef.setValue(currentUserData);
+    private void likeCurrentUser() {
+        if (!filteredUsers.isEmpty()) {
+            User likedUser = filteredUsers.get(0); // Get the first user in the list
+            String likedUserId = likedUser.getUserId();
+            String currentUserId = currentUser.getUid();
 
-                    DatabaseReference likedUserRef = usersRef.child(likedUserId);
-                    likedUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            User likedUser = snapshot.getValue(User.class);
-                            if (likedUser != null) {
-                                if (likedUser.getLikedUsers().contains(currentUser.getUid())) {
-                                    Log.d(TAG, "It's a match!");
-                                    createMatchForBothUsers(likedUserId);
-                                    showMatchDialog(likedUser);
-                                }
-                            }
-                        }
+            // Add the like to the database
+            likesRef.child(currentUserId).child(likedUserId).setValue(true);
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            Log.e(TAG, "Failed to check for matches", error.toException());
+            // Check if the liked user has already liked the current user
+            likesRef.child(likedUserId).child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // Mutual like detected
+                        showMatchNotification(likedUser.getName());
+
+                        // Add match to the Matches node
+                        DatabaseReference matchesRef = FirebaseDatabase.getInstance().getReference("Matches");
+                        matchesRef.child(currentUserId).child(likedUserId).setValue(true);
+                        matchesRef.child(likedUserId).child(currentUserId).setValue(true);
+
+                        // Update chat list for both users
+                        DatabaseReference userChatsRef = FirebaseDatabase.getInstance().getReference("UserChats");
+                        userChatsRef.child(currentUserId).child(likedUserId).setValue(true);
+                        userChatsRef.child(likedUserId).child(currentUserId).setValue(true);
+
+                        // Create a new chat
+                        DatabaseReference chatsRef = FirebaseDatabase.getInstance().getReference("Chats");
+                        String chatId = chatsRef.push().getKey();
+                        if (chatId != null) {
+                            Chat newChat = new Chat(chatId, currentUserId, likedUserId, "You have a new match!", System.currentTimeMillis());
+                            chatsRef.child(chatId).setValue(newChat);
                         }
-                    });
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Failed to update current user likes", error.toException());
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e(TAG, "Error checking mutual like", databaseError.toException());
+                }
+            });
+
+            filteredUsers.remove(0); // Remove the user from the list after the like
+            userAdapter.notifyDataSetChanged(); // Update the UI
+            Log.d(TAG, "User liked: " + likedUserId);
+        }
     }
 
-    private void createMatchForBothUsers(String matchedUserId) {
-        DatabaseReference matchesRef = FirebaseDatabase.getInstance().getReference("Matches");
-        String chatId = generateChatId(currentUser.getUid(), matchedUserId);
-        matchesRef.child(currentUser.getUid()).child(chatId).setValue(true);
-        matchesRef.child(matchedUserId).child(chatId).setValue(true);
+    private void showMatchNotification(String matchedUserName) {
+        // Inflate the dialog layout
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_match, null);
+
+        // Create a dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialog);
+        builder.setView(dialogView);
+
+        // Find and set the views in the dialog
+        TextView matchUserName = dialogView.findViewById(R.id.match_user_name);
+        Button closeButton = dialogView.findViewById(R.id.close_button);
+
+        // Set the match text
+        matchUserName.setText("You've matched with " + matchedUserName + "!");
+
+        // Set a click listener for the close button
+        AlertDialog dialog = builder.create();
+        closeButton.setOnClickListener(v -> dialog.dismiss());
+
+        // Create and show the dialog
+        dialog.show();
     }
 
-    private String generateChatId(String userId1, String userId2) {
-        return userId1.compareTo(userId2) < 0 ? userId1 + "_" + userId2 : userId2 + "_" + userId1;
+    private void dislikeCurrentUser() {
+        if (!filteredUsers.isEmpty()) {
+            User dislikedUser = filteredUsers.get(0); // Get the first user in the list
+            dislikesRef.child(currentUser.getUid()).child(dislikedUser.getUserId()).setValue(true);
+            filteredUsers.remove(0); // Remove the user from the list after the dislike
+            userAdapter.notifyDataSetChanged(); // Update the UI
+            Log.d(TAG, "User disliked: " + dislikedUser.getUserId());
+        }
     }
-
-    private void showMatchDialog(User matchedUser) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("New Match!")
-                .setMessage("You have a new match with " + matchedUser.getName() + "!")
-                .setPositiveButton("Chat now", (dialog, which) -> {
-                    Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                    intent.putExtra("matchedUserId", matchedUser.getUserId());
-                    startActivity(intent);
-                })
-                .setNegativeButton("Later", (dialog, which) -> dialog.dismiss())
-                .show();
-    }}
+}

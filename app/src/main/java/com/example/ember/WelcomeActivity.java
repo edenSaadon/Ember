@@ -51,10 +51,23 @@ public class WelcomeActivity extends AppCompatActivity {
     private double longitude;
     private String cityName;
 
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+
+        if (currentUser == null) {
+            // Redirect to login activity if the user is not logged in
+            startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
+            finish();
+            return;
+        }
 
         initializeViews();
         setupSpinners();
@@ -153,7 +166,6 @@ public class WelcomeActivity extends AppCompatActivity {
                         latitude = location.getLatitude();
                         longitude = location.getLongitude();
                         Log.d("WelcomeActivity", "Updated Location: " + latitude + ", " + longitude);
-                        // ניתן להוסיף כאן קוד נוסף לשימוש במיקום החדש
                     }
                 }
             }
@@ -182,6 +194,12 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void saveUserData() {
+        if (currentUser == null) {
+            Log.e("WelcomeActivity", "No current user logged in");
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String name = nameInput.getText().toString();
         int age = Integer.parseInt(ageInput.getText().toString());
         String hobby = hobbyInput.getText().toString();
@@ -195,7 +213,6 @@ public class WelcomeActivity extends AppCompatActivity {
         int partnerLocationRange = partnerLocationSeekBar.getProgress();
         String selectedPartnerGender = partnerGenderSpinner.getSelectedItem().toString();
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String userId = currentUser.getUid();
         String email = currentUser.getEmail();
         String phone = currentUser.getPhoneNumber();

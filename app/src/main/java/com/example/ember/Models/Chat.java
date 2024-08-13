@@ -1,6 +1,7 @@
 package com.example.ember.Models;
 
 public class Chat {
+    private String chatId; // מזהה ייחודי לצ'אט
     private String senderId;
     private String receiverId;
     private String message;
@@ -10,13 +11,25 @@ public class Chat {
         // נדרש עבור DataSnapshot
     }
 
-    public Chat(String senderId, String receiverId, String message, long timestamp) {
+    public Chat(String chatId, String senderId, String receiverId, String message, long timestamp) {
+        this.chatId = chatId;
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.message = message;
         this.timestamp = timestamp;
     }
 
+    // פונקציית החזר למזהה הצ'אט
+    public String getChatId() {
+        return chatId;
+    }
+
+    // פונקציית עדכון למזהה הצ'אט
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
+
+    // פונקציות החזר ועדכון לשולח
     public String getSenderId() {
         return senderId;
     }
@@ -25,6 +38,7 @@ public class Chat {
         this.senderId = senderId;
     }
 
+    // פונקציות החזר ועדכון למקבל
     public String getReceiverId() {
         return receiverId;
     }
@@ -33,6 +47,7 @@ public class Chat {
         this.receiverId = receiverId;
     }
 
+    // פונקציות החזר ועדכון להודעה
     public String getMessage() {
         return message;
     }
@@ -41,6 +56,7 @@ public class Chat {
         this.message = message;
     }
 
+    // פונקציות החזר ועדכון לזמן
     public long getTimestamp() {
         return timestamp;
     }

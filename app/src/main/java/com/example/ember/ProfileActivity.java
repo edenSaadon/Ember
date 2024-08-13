@@ -18,8 +18,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ember.Models.CircleTransform;
 import com.example.ember.Models.User;
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -83,6 +86,12 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 return true;
+            } else if (itemId == R.id.navigation_chat) {
+                startActivity(new Intent(ProfileActivity.this, ChatListActivity.class));
+                return true;
+            } else if (itemId == R.id.action_logout) {
+                performLogout();
+                return true;
             } else {
                 return false;
             }
@@ -144,7 +153,6 @@ public class ProfileActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     User user = dataSnapshot.getValue(User.class);
                     if (user != null) {
-                        // שימוש ב-GeocodingTask כדי לקבל שם עיר אם לא קיים
                         if (user.getCityName() == null || user.getCityName().isEmpty()) {
                             new com.example.ember.NominatimGeocodingTask() {
                                 @Override
@@ -198,5 +206,23 @@ public class ProfileActivity extends AppCompatActivity {
         details.append("Longitude: ").append(user.getLongitude()).append("\n");
 
         userDetails.setText(details.toString());
+    }
+
+    private void performLogout() {
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(ProfileActivity.this, "Successfully logged out", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(ProfileActivity.this, "Logout failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }
