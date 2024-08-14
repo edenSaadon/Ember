@@ -3,21 +3,25 @@ package com.example.ember;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import com.example.ember.Models.User;
-import com.example.ember.Models.UserAdapter;
+
 import com.example.ember.Models.Chat;
+import com.example.ember.Models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -29,14 +33,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private RecyclerView recyclerView;
-    private UserAdapter userAdapter;
+    private GestureDetector gestureDetector;
     private FirebaseUser currentUser;
     private DatabaseReference usersRef;
     private DatabaseReference likesRef;
@@ -49,8 +54,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        FrameLayout frameLayout = findViewById(R.id.frameLayout);
 
         usersRef = FirebaseDatabase.getInstance().getReference("Users");
         likesRef = FirebaseDatabase.getInstance().getReference("Likes");
@@ -91,27 +95,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btnLike = findViewById(R.id.btn_like);
-        Button btnDislike = findViewById(R.id.btn_dislike);
+        gestureDetector = new GestureDetector(this, new SwipeGestureDetector());
 
-        btnLike.setOnClickListener(v -> likeCurrentUser());
-        btnDislike.setOnClickListener(v -> dislikeCurrentUser());
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.bottom_navigation_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_logout) {
-            performLogout();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        frameLayout.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
     }
 
     private void performLogout() {
@@ -139,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
                 filteredUsers = new ArrayList<>();
                 User currentUserData = null;
 
-                // Retrieve current user data
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null && user.getUserId().equals(currentUser.getUid())) {
@@ -151,14 +136,15 @@ public class MainActivity extends AppCompatActivity {
                 if (currentUserData != null) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         User user = snapshot.getValue(User.class);
-                        // Exclude the current user, disliked users, and those you've already liked
                         if (user != null && !user.getUserId().equals(currentUser.getUid())) {
                             if (matchesCurrentUserPreferences(user, currentUserData)) {
                                 filteredUsers.add(user);
                             }
                         }
                     }
-                    setupRecyclerView(filteredUsers);
+                    if (!filteredUsers.isEmpty()) {
+                        setupFrameLayout(filteredUsers.get(0));
+                    }
                 } else {
                     Log.e(TAG, "Current user data not found in database");
                 }
@@ -172,20 +158,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean matchesCurrentUserPreferences(User user, User currentUser) {
-        // Gender Preference Match
         boolean genderMatch = false;
         if (currentUser.getSexualPreference().equals("Heterosexual")) {
             genderMatch = !user.getGender().equals(currentUser.getGender());
         } else if (currentUser.getSexualPreference().equals("Homosexual")) {
             genderMatch = user.getGender().equals(currentUser.getGender());
         } else if (currentUser.getSexualPreference().equals("Bisexual")) {
-            genderMatch = true; // Bisexual matches all genders
+            genderMatch = true;
         }
 
-        // Relationship Preference Match
         boolean relationshipMatch = user.getLookingFor().equals(currentUser.getLookingFor());
 
-        // Age Preference Match
         int minAge = 0;
         int maxAge = Integer.MAX_VALUE;
         if (currentUser.getPartnerAgeRange() != null && currentUser.getPartnerAgeRange().contains("-")) {
@@ -199,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
         }
         boolean ageMatch = user.getAge() >= minAge && user.getAge() <= maxAge;
 
-        // Location Preference Match
         double distance = calculateDistance(currentUser.getLatitude(), currentUser.getLongitude(), user.getLatitude(), user.getLongitude());
         boolean withinLocationRange = distance <= currentUser.getLocationRange();
 
@@ -207,56 +189,74 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371; // Radius of the earth in km
+        final int R = 6371;
         double latDistance = Math.toRadians(lat2 - lat1);
         double lonDistance = Math.toRadians(lon2 - lon1);
         double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // convert to kilometers
+        return R * c;
     }
 
-    private void setupRecyclerView(List<User> filteredUsers) {
-        if (filteredUsers.isEmpty()) {
-            Toast.makeText(this, "No users match your preferences", Toast.LENGTH_SHORT).show();
-        } else {
-            userAdapter = new UserAdapter(this, filteredUsers, userId -> {
-                Log.d(TAG, "User clicked: " + userId);
-                // You can define what to do when a user is clicked (e.g., like or dislike)
-            });
-            recyclerView.setAdapter(userAdapter);
+    private void setupFrameLayout(User user) {
+        FrameLayout frameLayout = findViewById(R.id.frameLayout);
+        frameLayout.removeAllViews();
+
+        View userView = LayoutInflater.from(this).inflate(R.layout.item_user, frameLayout, false);
+        TextView userName = userView.findViewById(R.id.user_name);
+        ImageView userImage = userView.findViewById(R.id.user_image);
+
+        userName.setText(user.getName() + ", " + user.getAge());
+        Picasso.get().load(user.getImageUrl()).into(userImage);
+
+        frameLayout.addView(userView);
+    }
+
+    private class SwipeGestureDetector extends GestureDetector.SimpleOnGestureListener {
+        private static final int SWIPE_THRESHOLD = 100;
+        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            Log.d(TAG, "onFling detected");
+            if (e1 == null || e2 == null) return false;
+            float diffX = e2.getX() - e1.getX();
+            float diffY = e2.getY() - e1.getY();
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffX > 0) {
+                        likeCurrentUser();
+                    } else {
+                        dislikeCurrentUser();
+                    }
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
     private void likeCurrentUser() {
         if (!filteredUsers.isEmpty()) {
-            User likedUser = filteredUsers.get(0); // Get the first user in the list
+            User likedUser = filteredUsers.get(0);
             String likedUserId = likedUser.getUserId();
             String currentUserId = currentUser.getUid();
 
-            // Add the like to the database
             likesRef.child(currentUserId).child(likedUserId).setValue(true);
 
-            // Check if the liked user has already liked the current user
             likesRef.child(likedUserId).child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        // Mutual like detected
                         showMatchNotification(likedUser.getName());
-
-                        // Add match to the Matches node
                         DatabaseReference matchesRef = FirebaseDatabase.getInstance().getReference("Matches");
                         matchesRef.child(currentUserId).child(likedUserId).setValue(true);
                         matchesRef.child(likedUserId).child(currentUserId).setValue(true);
-
-                        // Update chat list for both users
                         DatabaseReference userChatsRef = FirebaseDatabase.getInstance().getReference("UserChats");
                         userChatsRef.child(currentUserId).child(likedUserId).setValue(true);
                         userChatsRef.child(likedUserId).child(currentUserId).setValue(true);
 
-                        // Create a new chat
                         DatabaseReference chatsRef = FirebaseDatabase.getInstance().getReference("Chats");
                         String chatId = chatsRef.push().getKey();
                         if (chatId != null) {
@@ -272,42 +272,73 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            filteredUsers.remove(0); // Remove the user from the list after the like
-            userAdapter.notifyDataSetChanged(); // Update the UI
-            Log.d(TAG, "User liked: " + likedUserId);
+            filteredUsers.remove(0);
+            if (!filteredUsers.isEmpty()) {
+                setupFrameLayout(filteredUsers.get(0));
+            } else {
+                // Handle case when there are no more users to display
+            }
         }
-    }
-
-    private void showMatchNotification(String matchedUserName) {
-        // Inflate the dialog layout
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_match, null);
-
-        // Create a dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialog);
-        builder.setView(dialogView);
-
-        // Find and set the views in the dialog
-        TextView matchUserName = dialogView.findViewById(R.id.match_user_name);
-        Button closeButton = dialogView.findViewById(R.id.close_button);
-
-        // Set the match text
-        matchUserName.setText("You've matched with " + matchedUserName + "!");
-
-        // Set a click listener for the close button
-        AlertDialog dialog = builder.create();
-        closeButton.setOnClickListener(v -> dialog.dismiss());
-
-        // Create and show the dialog
-        dialog.show();
     }
 
     private void dislikeCurrentUser() {
         if (!filteredUsers.isEmpty()) {
-            User dislikedUser = filteredUsers.get(0); // Get the first user in the list
+            User dislikedUser = filteredUsers.get(0);
             dislikesRef.child(currentUser.getUid()).child(dislikedUser.getUserId()).setValue(true);
-            filteredUsers.remove(0); // Remove the user from the list after the dislike
-            userAdapter.notifyDataSetChanged(); // Update the UI
-            Log.d(TAG, "User disliked: " + dislikedUser.getUserId());
+            filteredUsers.remove(0);
+            if (!filteredUsers.isEmpty()) {
+                setupFrameLayout(filteredUsers.get(0));
+            } else {
+                // Handle case when there are no more users to display
+            }
         }
     }
+
+    private void showMatchNotification(String matchedUserName) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_match, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialog);
+        builder.setView(dialogView);
+
+        TextView matchUserName = dialogView.findViewById(R.id.user_name);
+        ImageView matchImageView = dialogView.findViewById(R.id.image_view);
+        Button closeButton = dialogView.findViewById(R.id.close_button);
+
+        // Set the match text and user image
+        matchUserName.setText("You've matched with " + matchedUserName + "!");
+        Picasso.get().load(currentUser.getPhotoUrl()).into(matchImageView);
+
+        // Start heart animation
+        startHeartAnimation(dialogView);
+
+        AlertDialog dialog = builder.create();
+        closeButton.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void startHeartAnimation(View dialogView) {
+        // יצירת אנימציה של לבבות
+        ImageView heart1 = new ImageView(this);
+        heart1.setImageResource(R.drawable.ic_heart);
+        ImageView heart2 = new ImageView(this);
+        heart2.setImageResource(R.drawable.ic_heart);
+
+        RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(100, 100);
+        params1.addRule(RelativeLayout.CENTER_IN_PARENT);
+        heart1.setLayoutParams(params1);
+
+        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(100, 100);
+        params2.addRule(RelativeLayout.CENTER_IN_PARENT);
+        heart2.setLayoutParams(params2);
+
+        RelativeLayout layout = dialogView.findViewById(R.id.match_layout);
+        layout.addView(heart1);
+        layout.addView(heart2);
+
+        // ביצוע אנימציה
+        heart1.animate().translationYBy(-200).alpha(0).setDuration(2000).start();
+        heart2.animate().translationYBy(-300).alpha(0).setDuration(2500).start();
+    }
+
 }

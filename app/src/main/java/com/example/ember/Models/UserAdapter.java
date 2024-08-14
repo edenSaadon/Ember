@@ -34,7 +34,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = userList.get(position);
-        holder.userName.setText(user.getName());
+
+        // הצגת שם המשתמש יחד עם הגיל
+        String nameAndAge = user.getName() + ", " + user.getAge();
+        holder.userName.setText(nameAndAge);
 
         // וודא שה-ImageView משתמש נכון ב-Picasso כדי לטעון את התמונה
         if (user.getImageUrl() != null && !user.getImageUrl().isEmpty()) {

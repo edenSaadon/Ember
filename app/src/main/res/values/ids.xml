@@ -32,6 +32,9 @@
     <item name="chat_header" type="id"/>
     <item name="user_profile_picture" type="id"/>
     <item name="chat_list_view" type="id"/>
+    <item name="frameLayout" type="id"/>
+    <item name="close_button" type="id"/>
+    <item name="match_layout" type="id"/>
 
 
 </resources>
