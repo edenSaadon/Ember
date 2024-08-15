@@ -33,4 +33,28 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="user_image">image_user\n</string>
+    <string name="app_name">Ember</string>
+        <!-- קידומות מדינות לדוגמה -->
+        <string-array name="country_codes">
+            <item>+1 (USA)</item>
+            <item>+44 (UK)</item>
+            <item>+49 (Germany)</item>
+            <item>+33 (France)</item>
+            <item>+91 (India)</item>
+            <item>+972 (Israel)</item>
+            <item>+61 (Australia)</item>
+            <item>+81 (Japan)</item>
+            <item>+86 (China)</item>
+            <item>+7 (Russia)</item>
+            <!-- ניתן להוסיף עוד קידומות מדינות לפי הצורך -->
+        </string-array>
+        <string name="login_with_email">Login with Email</string>
+        <string name="login_with_phone">Login with Phone</string>
+        <string name="or">OR</string>
+        <string name="email_hint">Email</string>
+        <string name="password_hint">Password</string>
+        <string name="phone_hint">Phone Number</string>
+        <string name="country_code_hint">Country Code</string>
+
+
 </resources>

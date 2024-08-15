@@ -4,29 +4,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PhoneVerificationActivity">
+    android:padding="16dp"
+    android:background="@drawable/gradient_background"
+    tools:context=".Activities.PhoneVerificationActivity">
 
+    <!-- כותרת המסך -->
+    <TextView
+        android:id="@+id/verification_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phone Verification"
+        android:textSize="24sp"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"/>
+
+    <!-- שדה הקוד -->
     <EditText
         android:id="@+id/input_code"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Enter Verification Code"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/rounded_edittext"
+        android:textColor="@android:color/black"
+        android:textColorHint="@color/colorPrimaryVariant"
+        android:padding="16dp"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@id/verification_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp"
-        android:padding="16dp"
-        android:inputType="number" />
+        android:layout_marginTop="16dp"/>
 
+    <!-- כפתור האימות -->
     <Button
         android:id="@+id/btn_verify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Verify Code"
+        android:background="@drawable/button_gradient"
+        android:textColor="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/input_code"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:padding="16dp" />
+        android:layout_marginTop="24dp"
+        android:padding="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

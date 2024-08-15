@@ -35,6 +35,25 @@
     <item name="frameLayout" type="id"/>
     <item name="close_button" type="id"/>
     <item name="match_layout" type="id"/>
+    <item name="top_bar" type="id"/>
+    <item name="app_name" type="id"/>
+    <item name="no_matches_text_view" type="id"/>
+    <item name="chats_title" type="id"/>
+    <item name="chat_recycler_view" type="id"/>
+    <item name="user_info" type="id"/>
+    <item name="txt_or" type="id"/>
+    <item name="spinner_country_code" type="id"/>
+    <item name="input_phone" type="id"/>
+    <item name="btn_login_phone" type="id"/>
+    <item name="textAppNameContainer" type="id"/>
+    <item name="letterE" type="id"/>
+    <item name="letterM" type="id"/>
+    <item name="letterB" type="id"/>
+    <item name="letterE2" type="id"/>
+    <item name="letterR" type="id"/>
+    <item name="textTagline" type="id"/>
+    <item name="buttonSignUp" type="id"/>
+    <item name="buttonExistingUserLogin" type="id"/>
 
 
 </resources>

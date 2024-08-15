@@ -1,42 +1,53 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginUserActivity">
+    android:padding="16dp"
+    android:background="@drawable/gradient_background"
+    tools:context=".Activities.LoginUserActivity">
 
-    <!-- Email and Password Section -->
+    <!-- Email Section -->
     <EditText
         android:id="@+id/input_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Email"
+        android:background="@drawable/rounded_edittext"
+        android:textColor="@android:color/black"
+        android:padding="16dp"
+        android:textColorHint="@color/colorPrimaryVariant"
+        android:inputType="textEmailAddress"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp"
-        android:padding="16dp"
-        android:inputType="textEmailAddress"/>
+        android:layout_marginTop="32dp"/>
 
+    <!-- Password Section -->
     <EditText
         android:id="@+id/input_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Password"
+        android:background="@drawable/rounded_edittext"
+        android:textColor="@android:color/black"
+        android:padding="16dp"
+        android:textColorHint="@color/colorPrimaryVariant"
+        android:inputType="textPassword"
         app:layout_constraintTop_toBottomOf="@id/input_email"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:padding="16dp"
-        android:inputType="textPassword"/>
+        android:layout_marginTop="16dp"/>
 
+    <!-- Login with Email Button -->
     <Button
         android:id="@+id/btn_login_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login with Email"
+        android:background="@drawable/button_gradient"
+        android:textColor="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/input_password"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,11 +60,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="OR"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/btn_login_email"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:textSize="18sp"/>
+        android:layout_marginTop="16dp"/>
 
     <!-- Phone Number Section -->
     <EditText
@@ -61,18 +74,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Phone Number"
+        android:background="@drawable/rounded_edittext"
+        android:textColor="@android:color/black"
+        android:textColorHint="@color/colorPrimaryVariant"
+        android:padding="16dp"
+        android:inputType="phone"
         app:layout_constraintTop_toBottomOf="@id/txt_or"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:padding="16dp"
-        android:inputType="phone"/>
+        android:layout_marginTop="16dp"/>
 
+    <!-- Login with Phone Button -->
     <Button
         android:id="@+id/btn_login_phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login with Phone"
+        android:background="@drawable/button_gradient"
+        android:textColor="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/input_phone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

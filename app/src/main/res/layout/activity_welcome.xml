@@ -1,7 +1,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/gradient_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,7 +14,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Questions about yourself"
-            android:textSize="18sp"
+            android:textSize="24sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
             android:paddingBottom="16dp" />
 
         <!-- שדות שאלות על עצמך -->
@@ -21,14 +24,22 @@
             android:id="@+id/input_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Name" />
+            android:hint="Name"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/input_age"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Age"
-            android:inputType="number" />
+            android:inputType="number"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/input_birthdate"
@@ -36,87 +47,140 @@
             android:layout_height="wrap_content"
             android:hint="Birthdate"
             android:focusable="false"
-            android:clickable="true" />
+            android:clickable="true"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/input_hobby"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Hobby" />
+            android:hint="Hobby"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <Spinner
             android:id="@+id/spinner_gender"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="16dp" />
 
         <Spinner
             android:id="@+id/spinner_sexual_preference"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="16dp" />
 
         <Spinner
             android:id="@+id/spinner_status"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/input_about_yourself"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Tell us about yourself" />
+            android:hint="Tell us about yourself"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- כותרת: שאלות על הפרטנר שאתה מחפש -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Questions about the partner you are looking for"
-            android:textSize="18sp"
+            android:textSize="24sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
             android:paddingTop="32dp"
             android:paddingBottom="16dp" />
+
+        <!-- הנחיה לתצורת כתיבת גיל הפרטנר -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please enter age range in the format: 20-32"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="8dp" />
 
         <!-- שדות שאלות על הפרטנר שאתה מחפש -->
         <EditText
             android:id="@+id/input_partner_age_range"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Preferred Partner Age Range" />
+            android:hint="Preferred Partner Age Range"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Partner Location Range"
-            android:paddingTop="16dp" />
+            android:textColor="@android:color/white"
+            android:paddingTop="16dp"
+            android:layout_marginBottom="8dp" />
 
         <SeekBar
             android:id="@+id/seekBar_partner_location_range"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="100" />
+            android:max="100"
+            android:progressTint="@color/colorPrimaryPink"
+            android:thumbTint="@color/colorPrimaryVariant"
+            android:layout_marginBottom="8dp" />
 
         <TextView
             android:id="@+id/txt_partner_location_range_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 km"
-            android:paddingTop="8dp" />
+            android:textColor="@android:color/white"
+            android:paddingTop="8dp"
+            android:layout_marginBottom="16dp" />
 
         <Spinner
             android:id="@+id/spinner_partner_gender"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="16dp" />
 
         <Spinner
             android:id="@+id/spinner_looking_for"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="16dp" />
 
         <!-- כפתור שמירה -->
         <Button
             android:id="@+id/btn_save"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save"
-            android:layout_marginTop="24dp" />
+            android:layout_marginTop="24dp"
+            android:background="@drawable/button_gradient"
+            android:textColor="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" />
 
     </LinearLayout>
 </ScrollView>
