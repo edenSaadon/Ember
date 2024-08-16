@@ -37,17 +37,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = userList.get(position);
 
-        // טעינת תמונת המשתמש
+        // loading image user
         if (user.getImageUrl() != null && !user.getImageUrl().isEmpty()) {
             Picasso.get().load(user.getImageUrl()).into(holder.userImage);
         } else {
-            holder.userImage.setImageResource(R.drawable.ic_profile); // תמונת ברירת מחדל
+            holder.userImage.setImageResource(R.drawable.ic_profile); // default image user
         }
 
-        // הגדרת מידע על המשתמש שיוצג בלחיצה
+        //Set information about the user to display with a click
         holder.userInfo.setText("Name: " + user.getName() + "\nAge: " + user.getAge() + "\nGender: " + user.getGender());
 
-        // טיפול בלחיצה על התמונה להצגת/הסתרת המידע
+        //Handling clicking on the image to show/hide the information
         holder.userImage.setOnClickListener(v -> {
             if (holder.userInfo.getVisibility() == View.GONE) {
                 holder.userInfo.setVisibility(View.VISIBLE);
@@ -56,7 +56,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             }
         });
 
-        // אפשרות ללחיצה על כל הפריט אם נדרש
+        // Option to click the entire item if required
         holder.itemView.setOnClickListener(v -> listener.onItemClick(user.getUserId()));
     }
 
@@ -76,7 +76,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         public UserViewHolder(View itemView) {
             super(itemView);
             userImage = itemView.findViewById(R.id.user_image);
-            userInfo = itemView.findViewById(R.id.user_info); // בדוק שהטקסט מובא פה
+            userInfo = itemView.findViewById(R.id.user_info); // Check that the text is provided here
         }
     }
 }

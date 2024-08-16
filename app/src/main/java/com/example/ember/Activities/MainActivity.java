@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser != null) {
             Log.d(TAG, "Current user ID: " + currentUser.getUid());
-            checkUserNotifications();  // בדיקת התראות חדשות
+            checkUserNotifications();  // check new notifications
             loadFilteredUsers();
         } else {
             Log.e(TAG, "Current user is null");
@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         // בדוק ש-TextView זה לא null
         TextView userName = userView.findViewById(R.id.user_name);
         ImageView userImage = userView.findViewById(R.id.user_image);
-        TextView userInfo = userView.findViewById(R.id.user_info); // וודא ש-TextView זה מאותר בצורה נכונה
+        TextView userInfo = userView.findViewById(R.id.user_info);
 
         // בדיקה האם userName נמצא
         if (userName != null) {
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
                             chatsRef.child(chatId).setValue(newChat);
                         }
 
-                        // שליחת התראה למשתמש השני עם השם הנכון של היוזר הנוכחי
+                        // send notification
                         sendMatchNotification(likedUserId, currentUser.getDisplayName());
                     }
                 }
@@ -397,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
     private void sendMatchNotification(String receiverUserId, String matchedUserName) {
         DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("Notifications").child(receiverUserId);
 
-        // יצירת הודעת התראה
+        // create notification message
         String notificationId = notificationRef.push().getKey();
         if (notificationId != null) {
             notificationRef.child(notificationId).setValue("You've matched with " + matchedUserName + "!");
@@ -415,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
                     if (message != null) {
                         Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
                     }
-                    // מחיקת ההודעה לאחר הצגת ההתראה
+                    // delete message after showing notification
                     snapshot.getRef().removeValue();
                 }
             }

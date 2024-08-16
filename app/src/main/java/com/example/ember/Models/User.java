@@ -246,7 +246,7 @@ public class User {
         }
     }
 
-    // פונקציה שמחזירה את סטטוס התמונה
+    // Function that returns image status
     public int getImageStatusForUser() {
         return imageStatus;
     }

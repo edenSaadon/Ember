@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         handler.postDelayed(() -> letterE2.startAnimation(bounceAnimation), 700);
         handler.postDelayed(() -> letterR.startAnimation(bounceAnimation), 900);
 
-        buttonSignUp.setOnClickListener(v -> signUp()); // שולח את המשתמש למסך ההרשמה
+        buttonSignUp.setOnClickListener(v -> signUp()); // send user to registration screen
 
         buttonExistingUserLogin.setOnClickListener(v -> {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
