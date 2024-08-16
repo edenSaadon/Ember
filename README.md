@@ -20,9 +20,7 @@
   - Input fields for email/phone number.
   - Redirection to the questionnaire screen after successful registration.
 - **Screenshot:**
-![SignUp_Screen](https://github.com/user-attachments/assets/661ac88d-56c9-40ab-a3ca-1f6ecd403855)
-![SignUp_Screen_Email](https://github.com/user-attachments/assets/107e1054-c78d-4e45-b7cf-68b5b67bb136)
-![SignUp_Screen_Phone](https://github.com/user-attachments/assets/ad52b3ca-99ee-47b6-aa27-a6d04f0b4c27)
+  ![Registration Screen](path/to/your/image.png)
 
 ### 2. Questionnaire Screen
 - **Purpose:** Collects user preferences and interests.
@@ -30,9 +28,7 @@
   - Multiple-choice questions about gender preference, age range, hobbies, and more.
   - Sets the foundation for matching users.
 - **Screenshot:**
-![Questionerie_Screen1](https://github.com/user-attachments/assets/24e3a962-8234-4b7f-b1fa-98ddc8c517c0)
-- **Screenshot:**
-![Questionerie_Screen2](https://github.com/user-attachments/assets/5773e4ea-ff68-4fc3-8d2b-31c1723733b4)
+  ![Questionnaire Screen](path/to/your/image.png)
 
 ### 3. Home Screen
 - **Purpose:** Displays profiles of potential matches.
@@ -40,7 +36,7 @@
   - Swipe left to dislike, swipe right to like.
   - Filters profiles based on user preferences (gender, age, location).
 - **Screenshot:**
-  ![Home_Screen](https://github.com/user-attachments/assets/82d22a63-24ae-4558-ae50-ccdbb44f66ae)
+  ![Home Screen](path/to/your/image.png)
 
 ### 4. Match Notification Screen
 - **Purpose:** Informs users when a mutual match occurs.
@@ -48,7 +44,7 @@
   - Displays the matched user's profile picture and name.
   - Option to start a chat immediately.
 - **Screenshot:**
-  ![Match](https://github.com/user-attachments/assets/9decb11a-9fc3-4d53-ab1c-4a397ce965c3)
+  ![Match Notification Screen](path/to/your/image.png)
 
 ### 5. Chat Screen
 - **Purpose:** Allows users to communicate with their matches.
@@ -74,8 +70,8 @@
   - Option to recover forgotten password.
   - Redirection to the home screen after successful login.
 - **Screenshot:**
-![login_screen](https://github.com/user-attachments/assets/175223ac-f241-498f-a81b-16a2d27db066)
-![Login_Screen1](https://github.com/user-attachments/assets/71a89fd8-e7ff-4eba-afda-352eb806d275)
+  ![Login Screen](path/to/your/image.png)
+
 ## Technologies Used
 
 ### Firebase
@@ -89,3 +85,19 @@ Ember uses various Firebase services to power its backend and authentication:
 ### Google Maps
 
 - **Google Maps API:** Integrates with the app to display and filter potential matches based on geographical proximity.
+
+## Installation & Setup
+
+To run Ember locally or deploy it, follow these steps:
+
+### Prerequisites
+
+- **Android Studio:** Ensure you have the latest version installed.
+- **Firebase:** Set up a Firebase project and integrate it with the app for authentication, database, and storage functionality.
+- **Google Maps API Key:** Obtain a key from Google Cloud Console and add it to your project.
+
+### Steps
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/yourusername/ember.git
