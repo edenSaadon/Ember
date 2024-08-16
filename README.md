@@ -1,4 +1,4 @@
-![home](https://github.com/user-attachments/assets/09ef70f9-9e76-4eed-9fbc-65dfa2b106fe)![home](https://github.com/user-attachments/assets/1cb60ce5-03f2-4b5d-8975-6b37c551d4d7)# Ember - Dating App
+# Ember - Dating App
 
 **Ember** is a modern and innovative dating application designed to connect people based on their preferences and interests. This README provides an overview of the application’s features, the flow of screens, and setup instructions.
 
