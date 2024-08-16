@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser != null) {
             Log.d(TAG, "Current user ID: " + currentUser.getUid());
+            checkUserNotifications();  // בדיקת התראות חדשות
             loadFilteredUsers();
         } else {
             Log.e(TAG, "Current user is null");
@@ -253,9 +254,6 @@ public class MainActivity extends AppCompatActivity {
         return genderMatch && ageMatch && distanceMatch;
     }
 
-
-
-
     private void showNoUsersMessage() {
         FrameLayout frameLayout = findViewById(R.id.frameLayout);
         frameLayout.removeAllViews();
@@ -273,9 +271,6 @@ public class MainActivity extends AppCompatActivity {
 
         frameLayout.addView(noUsersView);
     }
-
-
-
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371;
@@ -314,8 +309,6 @@ public class MainActivity extends AppCompatActivity {
 
         frameLayout.addView(userView);
     }
-
-
 
     private class SwipeGestureDetector extends GestureDetector.SimpleOnGestureListener {
         private static final int SWIPE_THRESHOLD = 100;
@@ -366,6 +359,9 @@ public class MainActivity extends AppCompatActivity {
                             Chat newChat = new Chat(chatId, currentUserId, likedUserId, "You have a new match!", System.currentTimeMillis());
                             chatsRef.child(chatId).setValue(newChat);
                         }
+
+                        // שליחת התראה למשתמש השני עם השם הנכון של היוזר הנוכחי
+                        sendMatchNotification(likedUserId, currentUser.getDisplayName());
                     }
                 }
 
@@ -384,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void dislikeCurrentUser() {
         if (!filteredUsers.isEmpty()) {
             User dislikedUser = filteredUsers.get(0);
@@ -395,6 +392,39 @@ public class MainActivity extends AppCompatActivity {
                 showNoUsersMessage();
             }
         }
+    }
+
+    private void sendMatchNotification(String receiverUserId, String matchedUserName) {
+        DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("Notifications").child(receiverUserId);
+
+        // יצירת הודעת התראה
+        String notificationId = notificationRef.push().getKey();
+        if (notificationId != null) {
+            notificationRef.child(notificationId).setValue("You've matched with " + matchedUserName + "!");
+        }
+    }
+
+    private void checkUserNotifications() {
+        DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("Notifications").child(currentUser.getUid());
+
+        notificationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String message = snapshot.getValue(String.class);
+                    if (message != null) {
+                        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
+                    // מחיקת ההודעה לאחר הצגת ההתראה
+                    snapshot.getRef().removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e(TAG, "Failed to load notifications", databaseError.toException());
+            }
+        });
     }
 
     private void showMatchNotification(String matchedUserName) {
