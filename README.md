@@ -94,18 +94,3 @@ Ember uses various Firebase services to power its backend and authentication:
 
 - **Google Maps API:** Integrates with the app to display and filter potential matches based on geographical proximity.
 
-## Installation & Setup
-
-To run Ember locally or deploy it, follow these steps:
-
-### Prerequisites
-
-- **Android Studio:** Ensure you have the latest version installed.
-- **Firebase:** Set up a Firebase project and integrate it with the app for authentication, database, and storage functionality.
-- **Google Maps API Key:** Obtain a key from Google Cloud Console and add it to your project.
-
-### Steps
-
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/yourusername/ember.git
