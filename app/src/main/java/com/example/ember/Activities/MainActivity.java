@@ -406,9 +406,20 @@ public class MainActivity extends AppCompatActivity {
         String notificationId = notificationRef.push().getKey();
         if (notificationId != null) {
             String senderUserName = currentUser.getDisplayName();
+
+            // Log the current user display name
+            Log.d(TAG, "Sender Display Name: " + senderUserName);
+
+            // Check if senderUserName is null, and if so, use a fallback
+            if (senderUserName == null || senderUserName.isEmpty()) {
+                Log.w(TAG, "Display Name is null or empty, using fallback name");
+                senderUserName = "Someone"; // Fallback to a generic name if the display name is null
+            }
+
             notificationRef.child(notificationId).setValue("You've matched with " + senderUserName + "!");
         }
     }
+
 
 
     private void checkUserNotifications() {
