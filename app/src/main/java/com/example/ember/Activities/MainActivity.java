@@ -406,6 +406,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // NOTE: When a match is made from the second user account, the name appears correctly in the first user's notification.
+    // However, when the match is initiated from the first user account, the name does not always pass correctly.
+
     private void sendMatchNotification(String receiverUserId, String matchedUserName) {
         DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("Notifications").child(receiverUserId);
 
