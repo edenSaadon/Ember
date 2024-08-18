@@ -347,6 +347,12 @@ public class MainActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         String matchedUserName = likedUser.getName(); // Store the name for consistent notifications
+
+                        // Check if the name is null and provide a fallback
+                        if (matchedUserName == null || matchedUserName.isEmpty()) {
+                            matchedUserName = "New Match"; // Fallback name if the user's name is null or empty
+                        }
+
                         String matchedUserImageUrl = likedUser.getImageUrl(); // Get the matched user's image URL
 
                         // Show match notification with matched user’s details
@@ -386,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void dislikeCurrentUser() {
         if (!filteredUsers.isEmpty()) {
             User dislikedUser = filteredUsers.get(0);
@@ -406,21 +413,9 @@ public class MainActivity extends AppCompatActivity {
         String notificationId = notificationRef.push().getKey();
         if (notificationId != null) {
             String senderUserName = currentUser.getDisplayName();
-
-            // Log the current user display name
-            Log.d(TAG, "Sender Display Name: " + senderUserName);
-
-            // Check if senderUserName is null, and if so, use a fallback
-            if (senderUserName == null || senderUserName.isEmpty()) {
-                Log.w(TAG, "Display Name is null or empty, using fallback name");
-                senderUserName = matchedUserName != null ? matchedUserName : "Someone"; // Use matched user name as fallback if available
-            }
-
             notificationRef.child(notificationId).setValue("You've matched with " + senderUserName + "!");
         }
     }
-
-
 
 
     private void checkUserNotifications() {
@@ -452,12 +447,18 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialog);
         builder.setView(dialogView);
 
-        TextView matchUserName = dialogView.findViewById(R.id.user_name);
+        TextView matchUserNameTextView = dialogView.findViewById(R.id.user_name);
         ImageView matchImageView = dialogView.findViewById(R.id.image_view);
         Button closeButton = dialogView.findViewById(R.id.close_button);
 
+        // Check if the matched user name is null or empty; if so, use a default message
+        if (matchedUserName == null || matchedUserName.isEmpty()) {
+            matchedUserName = "a new match"; // Default value
+        }
+
         // Set the match text and user image
-        matchUserName.setText("You've matched with " + matchedUserName + "!");
+        matchUserNameTextView.setText("You've matched with " + matchedUserName + "!");
+
         if (matchedUserImageUrl != null && !matchedUserImageUrl.isEmpty()) {
             Picasso.get().load(matchedUserImageUrl).into(matchImageView);
         } else {
@@ -475,6 +476,9 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.show();
     }
+
+
+
 
 
     private void startHeartAnimation(View dialogView) {
