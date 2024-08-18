@@ -464,6 +464,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+
     private void startHeartAnimation(View dialogView) {
         // Create heart animation
         ImageView heart1 = new ImageView(this);
