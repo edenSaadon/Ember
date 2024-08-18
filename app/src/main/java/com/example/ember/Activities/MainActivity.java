@@ -413,12 +413,13 @@ public class MainActivity extends AppCompatActivity {
             // Check if senderUserName is null, and if so, use a fallback
             if (senderUserName == null || senderUserName.isEmpty()) {
                 Log.w(TAG, "Display Name is null or empty, using fallback name");
-                senderUserName = "Someone"; // Fallback to a generic name if the display name is null
+                senderUserName = matchedUserName != null ? matchedUserName : "Someone"; // Use matched user name as fallback if available
             }
 
             notificationRef.child(notificationId).setValue("You've matched with " + senderUserName + "!");
         }
     }
+
 
 
 
