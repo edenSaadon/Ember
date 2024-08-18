@@ -51,7 +51,6 @@ public class WelcomeActivity extends AppCompatActivity {
     private double latitude;
     private double longitude;
     private String cityName;
-
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
 
@@ -201,25 +200,47 @@ public class WelcomeActivity extends AppCompatActivity {
             return;
         }
 
-        String name = nameInput.getText().toString();
-        int age = Integer.parseInt(ageInput.getText().toString());
-        String hobby = hobbyInput.getText().toString();
-        String aboutYourself = aboutYourselfInput.getText().toString();
-        String birthdate = birthdateInput.getText().toString();
+        String name = nameInput.getText().toString().trim();
+        String ageStr = ageInput.getText().toString().trim();
+        String hobby = hobbyInput.getText().toString().trim();
+        String aboutYourself = aboutYourselfInput.getText().toString().trim();
+        String birthdate = birthdateInput.getText().toString().trim();
         String selectedGender = genderSpinner.getSelectedItem().toString();
         String selectedSexualPreference = sexualPreferenceSpinner.getSelectedItem().toString();
         String selectedStatus = statusSpinner.getSelectedItem().toString();
         String selectedLookingFor = lookingForSpinner.getSelectedItem().toString();
-        String partnerAgeRange = partnerAgeRangeInput.getText().toString();
+        String partnerAgeRange = partnerAgeRangeInput.getText().toString().trim();
         int partnerLocationRange = partnerLocationSeekBar.getProgress();
         String selectedPartnerGender = partnerGenderSpinner.getSelectedItem().toString();
+
+        // Check if all fields are filled
+        if (name.isEmpty() || ageStr.isEmpty() || hobby.isEmpty() || aboutYourself.isEmpty() || birthdate.isEmpty() ||
+                selectedGender.isEmpty() || selectedSexualPreference.isEmpty() || selectedStatus.isEmpty() ||
+                selectedLookingFor.isEmpty() || partnerAgeRange.isEmpty() || selectedPartnerGender.isEmpty()) {
+
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        int age;
+        try {
+            age = Integer.parseInt(ageStr);
+        } catch (NumberFormatException e) {
+            Log.e("WelcomeActivity", "Invalid age format: " + ageStr, e);
+            Toast.makeText(this, "Age must be a valid number", Toast.LENGTH_LONG).show();
+            return;
+        }
+
 
         String userId = currentUser.getUid();
         String email = currentUser.getEmail();
         String phone = currentUser.getPhoneNumber();
-        String imageUrl = ""; // ניתן להוסיף URL של תמונת פרופיל כאן אם יש
+        String imageUrl = ""; // You can add a profile image URL here if available
 
-        User user = new User(userId, name, email, phone, selectedSexualPreference, selectedGender, age, hobby, selectedStatus, selectedLookingFor, birthdate, partnerAgeRange, String.valueOf(partnerLocationRange), selectedPartnerGender, aboutYourself, latitude, longitude, partnerLocationRange, imageUrl, cityName, 2);
+        User user = new User(userId, name, email, phone, selectedSexualPreference, selectedGender, age, hobby, selectedStatus,
+                selectedLookingFor, birthdate, partnerAgeRange, String.valueOf(partnerLocationRange),
+                selectedPartnerGender, aboutYourself, latitude, longitude, partnerLocationRange, imageUrl,
+                cityName, 2);
 
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Users");
         usersRef.child(userId).setValue(user);
@@ -228,6 +249,7 @@ public class WelcomeActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

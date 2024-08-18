@@ -8,6 +8,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -26,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
     private Button buttonSignUp;
     private Button buttonExistingUserLogin;
 
@@ -72,7 +72,9 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
     private void signUp() {
+        //Future improvement - Login also using a Facebook / Instagram account
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.PhoneBuilder().build());
@@ -103,9 +105,25 @@ public class LoginActivity extends AppCompatActivity {
                 transactToWelcomeActivity();
             }
         } else {
-            // Sign in failed, handle error here
+            // Sign in failed
+            Toast.makeText(this, "Sign-up failed. Please check your internet connection and try again.", Toast.LENGTH_LONG).show();
         }
     }
+
+//    /**
+//     * This method checks if the user's profile is complete. It's useful for:
+//     *
+//     * 1. **Multi-device login:** Ensures the profile is complete when signing in from a new device.
+//     *
+//     * 2. **Future profile updates:** Verifies that the profile meets any new requirements.
+//     *
+//     * 3. **Error handling:** Adds an extra layer of verification in case of registration errors.
+//     *
+//     * 4. **Preventing mistakes:** Acts as a precaution to ensure the profile is always complete.
+//     *
+//     * **Current Situation:**
+//     * Since profile completion is already enforced during registration, this check may be redundant but could be useful for future flexibility.
+//     */
 
     private void checkUserProfile(FirebaseUser user) {
         // Check if the user has completed their profile

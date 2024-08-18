@@ -5,10 +5,10 @@
         android:startColor="#E91E63"
     android:endColor="#2196F3"
     android:angle="90"/>
-    <corners android:radius="16dp"/> <!-- פינות מעוגלות -->
+    <corners android:radius="16dp"/> <!-- rounded corners -->
     <padding
         android:left="8dp"
         android:top="8dp"
         android:right="8dp"
-        android:bottom="8dp"/> <!-- שוליים פנימיים -->
+        android:bottom="8dp"/> <!-- inner margin -->
 </shape>

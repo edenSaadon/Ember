@@ -1,10 +1,10 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FFFFFF" /> <!-- צבע רקע לבן -->
-    <corners android:radius="16dp" /> <!-- פינות מעוגלות -->
-    <shadowColor android:color="#B0BEC5" /> <!-- צבע צל -->
+    <solid android:color="#FFFFFF" /> <!-- white background color -->
+    <corners android:radius="16dp" /> <!-- rounded corners -->
+    <shadowColor android:color="#B0BEC5" /> <!-- shadow color -->
     <stroke
         android:width="2dp"
-        android:color="#E0E0E0" /> <!-- תיחום קל -->
+        android:color="#E0E0E0" />
     <padding
         android:left="16dp"
         android:top="12dp"

@@ -8,7 +8,7 @@
     android:background="@drawable/gradient_background"
     tools:context=".Activities.PhoneVerificationActivity">
 
-    <!-- כותרת המסך -->
+    <!-- screen title -->
     <TextView
         android:id="@+id/verification_title"
         android:layout_width="wrap_content"
@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp"/>
 
-    <!-- שדה הקוד -->
+    <!-- the code field -->
     <EditText
         android:id="@+id/input_code"
         android:layout_width="0dp"
@@ -38,7 +38,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
 
-    <!-- כפתור האימות -->
+    <!-- the authentication button -->
     <Button
         android:id="@+id/btn_verify"
         android:layout_width="wrap_content"

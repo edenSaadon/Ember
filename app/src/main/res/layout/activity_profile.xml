@@ -7,7 +7,7 @@
     android:background="@drawable/gradient_background"
     tools:context=".Activities.ProfileActivity">
 
-    <!-- לשונית כותרת פרופיל -->
+    <!-- Profile Title Tab -->
     <LinearLayout
         android:id="@+id/profile_tab"
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:textColor="@android:color/white" />
     </LinearLayout>
 
-    <!-- תמונת המשתמש -->
+    <!-- the user image -->
     <ImageView
         android:id="@+id/user_image"
         android:layout_width="150dp"
@@ -39,7 +39,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5" />
 
-    <!-- שאר התוכן נשאר כפי שהיה -->
+    <!-- The rest of the content remains as it was -->
     <TextView
         android:id="@+id/user_name"
         android:layout_width="wrap_content"

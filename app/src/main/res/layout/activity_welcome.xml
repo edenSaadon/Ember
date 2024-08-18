@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- כותרת: שאלות על עצמך -->
+        <!-- Title: Questions about yourself -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
             android:textStyle="bold"
             android:paddingBottom="16dp" />
 
-        <!-- שדות שאלות על עצמך -->
+        <!-- Question fields about yourself -->
         <EditText
             android:id="@+id/input_name"
             android:layout_width="match_parent"
@@ -97,7 +97,7 @@
             android:padding="12dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- כותרת: שאלות על הפרטנר שאתה מחפש -->
+        <!-- Title: Questions about the partner you are looking for -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
             android:paddingTop="32dp"
             android:paddingBottom="16dp" />
 
-        <!-- הנחיה לתצורת כתיבת גיל הפרטנר -->
+        <!-- Instruction for the configuration of writing the age of the partner -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
             android:textColor="@android:color/white"
             android:layout_marginBottom="8dp" />
 
-        <!-- שדות שאלות על הפרטנר שאתה מחפש -->
+        <!-- Question fields about the partner you are looking for -->
         <EditText
             android:id="@+id/input_partner_age_range"
             android:layout_width="match_parent"
@@ -170,7 +170,7 @@
             android:textColor="@android:color/black"
             android:layout_marginBottom="16dp" />
 
-        <!-- כפתור שמירה -->
+        <!-- save button -->
         <Button
             android:id="@+id/btn_save"
             android:layout_width="match_parent"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#80000000" /> <!-- צבע רקע כהה עם שקיפות -->
-    <corners android:radius="16dp" /> <!-- פינות מעוגלות -->
+    <solid android:color="#80000000" /> <!-- dark background color with transparency -->
+    <corners android:radius="16dp" /> <!-- rounded corners -->
     <padding
         android:left="16dp"
         android:top="16dp"

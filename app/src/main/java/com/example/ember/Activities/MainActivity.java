@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser != null) {
             Log.d(TAG, "Current user ID: " + currentUser.getUid());
-            checkUserNotifications();  // check new notifications
+            checkUserNotifications();  // Check for new notifications
             loadFilteredUsers();
         } else {
             Log.e(TAG, "Current user is null");
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Distance Preference Match (Mandatory)
         boolean distanceMatch = false;
-        if (currentUser.getLocationRange() > 0) {
+        if (currentUser.getLocationRange() >= 0) { // Allow zero distance
             double distance = calculateDistance(currentUser.getLatitude(), currentUser.getLongitude(), user.getLatitude(), user.getLongitude());
             distanceMatch = distance <= currentUser.getLocationRange();
         }
@@ -261,11 +261,11 @@ public class MainActivity extends AppCompatActivity {
         View noUsersView = LayoutInflater.from(this).inflate(R.layout.no_users_message, frameLayout, false);
         TextView noUsersMessage = noUsersView.findViewById(R.id.no_users_message);
 
-        // יצירת צבע משולב של כחול ורוד
+        // Create a blended color of pink and blue
         Shader textShader = new LinearGradient(0, 0, 0, noUsersMessage.getTextSize(),
                 new int[]{
-                        Color.parseColor("#FF00FF"), // ורוד
-                        Color.parseColor("#0000FF"), // כחול
+                        Color.parseColor("#FF00FF"), // Pink
+                        Color.parseColor("#0000FF"), // Blue
                 }, null, Shader.TileMode.CLAMP);
         noUsersMessage.getPaint().setShader(textShader);
 
@@ -289,12 +289,12 @@ public class MainActivity extends AppCompatActivity {
 
         View userView = LayoutInflater.from(this).inflate(R.layout.item_user, frameLayout, false);
 
-        // בדוק ש-TextView זה לא null
+        // Make sure this TextView is not null
         TextView userName = userView.findViewById(R.id.user_name);
         ImageView userImage = userView.findViewById(R.id.user_image);
         TextView userInfo = userView.findViewById(R.id.user_info);
 
-        // בדיקה האם userName נמצא
+        // Check if userName is found
         if (userName != null) {
             userName.setText(user.getName() + ", " + user.getAge());
         } else {
@@ -346,9 +346,15 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        showMatchNotification(likedUser.getName());
+                        String matchedUserName = likedUser.getName(); // Store the name for consistent notifications
+                        String matchedUserImageUrl = likedUser.getImageUrl(); // Get the matched user's image URL
+
+                        // Show match notification with matched user’s details
+                        showMatchNotification(matchedUserName, matchedUserImageUrl);
+
                         matchesRef.child(currentUserId).child(likedUserId).setValue(true);
                         matchesRef.child(likedUserId).child(currentUserId).setValue(true);
+
                         DatabaseReference userChatsRef = FirebaseDatabase.getInstance().getReference("UserChats");
                         userChatsRef.child(currentUserId).child(likedUserId).setValue(true);
                         userChatsRef.child(likedUserId).child(currentUserId).setValue(true);
@@ -360,8 +366,8 @@ public class MainActivity extends AppCompatActivity {
                             chatsRef.child(chatId).setValue(newChat);
                         }
 
-                        // send notification
-                        sendMatchNotification(likedUserId, currentUser.getDisplayName());
+                        // Send the notification with the correct user name
+                        sendMatchNotification(likedUserId, matchedUserName);
                     }
                 }
 
@@ -380,7 +386,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private void dislikeCurrentUser() {
         if (!filteredUsers.isEmpty()) {
             User dislikedUser = filteredUsers.get(0);
@@ -397,12 +402,14 @@ public class MainActivity extends AppCompatActivity {
     private void sendMatchNotification(String receiverUserId, String matchedUserName) {
         DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("Notifications").child(receiverUserId);
 
-        // create notification message
+        // Create notification message
         String notificationId = notificationRef.push().getKey();
         if (notificationId != null) {
-            notificationRef.child(notificationId).setValue("You've matched with " + matchedUserName + "!");
+            String senderUserName = currentUser.getDisplayName();
+            notificationRef.child(notificationId).setValue("You've matched with " + senderUserName + "!");
         }
     }
+
 
     private void checkUserNotifications() {
         DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("Notifications").child(currentUser.getUid());
@@ -415,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
                     if (message != null) {
                         Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
                     }
-                    // delete message after showing notification
+                    // Delete the message after showing the notification
                     snapshot.getRef().removeValue();
                 }
             }
@@ -427,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showMatchNotification(String matchedUserName) {
+    private void showMatchNotification(String matchedUserName, String matchedUserImageUrl) {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_match, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialog);
@@ -439,7 +446,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the match text and user image
         matchUserName.setText("You've matched with " + matchedUserName + "!");
-        Picasso.get().load(currentUser.getPhotoUrl()).into(matchImageView);
+        if (matchedUserImageUrl != null && !matchedUserImageUrl.isEmpty()) {
+            Picasso.get().load(matchedUserImageUrl).into(matchImageView);
+        } else {
+            matchImageView.setImageResource(R.drawable.ic_profile); // Default image if no URL
+        }
 
         // Start heart animation
         startHeartAnimation(dialogView);

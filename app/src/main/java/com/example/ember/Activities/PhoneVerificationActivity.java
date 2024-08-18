@@ -47,22 +47,8 @@ public class PhoneVerificationActivity extends AppCompatActivity {
 
     private void verifyCode(String code) {
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
-        signInWithPhoneAuthCredential(credential);
+        LoginUserActivity.signInWithPhoneAuthCredential(credential, this);
     }
 
-    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Intent intent = new Intent(PhoneVerificationActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(PhoneVerificationActivity.this, "Verification failed", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
+
 }

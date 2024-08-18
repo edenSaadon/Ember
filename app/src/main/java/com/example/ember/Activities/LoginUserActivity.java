@@ -1,5 +1,7 @@
 package com.example.ember.Activities;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,8 +29,9 @@ public class LoginUserActivity extends AppCompatActivity {
 
     private EditText emailInput, passwordInput, phoneInput;
     private Button btnLoginEmail, btnLoginPhone;
-    private FirebaseAuth mAuth;
+    private static FirebaseAuth mAuth;
     private String verificationId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +97,10 @@ public class LoginUserActivity extends AppCompatActivity {
                 this,
                 new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
+                    // In some cases, Firebase can auto-verify the user without manual code entry.
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                        signInWithPhoneAuthCredential(phoneAuthCredential);
+                        // Call the unified function with the context
+                        signInWithPhoneAuthCredential(phoneAuthCredential, LoginUserActivity.this);
                     }
 
                     @Override
@@ -115,20 +120,28 @@ public class LoginUserActivity extends AppCompatActivity {
                 });
     }
 
-    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+
+static void signInWithPhoneAuthCredential(PhoneAuthCredential credential, final Context context) {
+    mAuth.signInWithCredential(credential)
+            .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        // Handle UI update or activity transition based on context
+                        if (context instanceof LoginUserActivity) {
+                            ((LoginUserActivity) context).updateUI(mAuth.getCurrentUser());
                         } else {
-                            Toast.makeText(LoginUserActivity.this, "Phone authentication failed.", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(context, MainActivity.class);
+                            context.startActivity(intent);
+                            ((Activity) context).finish();
                         }
+                    } else {
+                        Toast.makeText(context, "Phone authentication failed.", Toast.LENGTH_SHORT).show();
                     }
-                });
-    }
+                }
+            });
+}
+
 
     @Override
     protected void onStart() {

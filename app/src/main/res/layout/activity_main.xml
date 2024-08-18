@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- לשונית עליונה עם שם האפליקציה -->
+    <!-- top tab with the app name -->
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:layout_centerInParent="true"/>
     </RelativeLayout>
 
-    <!-- FrameLayout להצגת פרופילי משתמשים -->
+    <!-- FrameLayout for displaying user profiles -->
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
         android:focusable="true"
         android:focusableInTouchMode="true"/>
 
-    <!-- סרגל ניווט תחתון -->
+    <!-- Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"

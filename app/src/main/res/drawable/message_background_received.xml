@@ -2,13 +2,13 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient
-        android:startColor="#2196F3"
+    android:startColor="#2196F3"
     android:endColor="#E91E63"
     android:angle="90"/>
-    <corners android:radius="16dp"/> <!-- פינות מעוגלות -->
+    <corners android:radius="16dp"/> <!-- rounded corners -->
     <padding
         android:left="8dp"
         android:top="8dp"
         android:right="8dp"
-        android:bottom="8dp"/> <!-- שוליים פנימיים -->
+        android:bottom="8dp"/> <!-- inner margin -->
 </shape>

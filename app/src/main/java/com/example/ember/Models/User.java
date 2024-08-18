@@ -23,9 +23,9 @@ public class User {
     private double longitude;
     private int locationRange;
     private String imageUrl;
-    private String cityName; // שדה לשם העיר
-    private int imageStatus; // סטטוס התמונה (1 - לייק, 0 - דיסלייק, 2 - דיפולט)
-    private List<String> likedUsers; // רשימת משתמשים שעשו לייק
+    private String cityName;
+    private int imageStatus; // The status of the image (1 - like, 0 - dislike, 2 - default)
+    private List<String> likedUsers; // List of users who have liked
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
