@@ -23,6 +23,7 @@ Watch the demo of the app here: [Link](https://drive.google.com/file/d/1iD8oUSKu
   - Input fields for email/phone number.
   - Redirection to the questionnaire screen after successful registration.
 - **Screenshot:**
+  
 ![signup](https://github.com/user-attachments/assets/e687ebfa-1e8a-48ca-8980-31a1b80e8f53)
 - **Screenshot:**
   
